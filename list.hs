@@ -10,13 +10,13 @@ tabulateL f n
 
 --MAP
 mapL :: (a -> b) -> [a] -> [b]
-mapL f []     = []
+mapL _ []     = []
 mapL f (x:xs) = let (a,b) = f x ||| (map f xs)
                 in a:b 
 
 --FILTER
 filterL :: (a -> Bool) -> [a] -> [a]
-filterL f [] = []
+filterL _ [] = []
 filterL f (x:xs) = let (a,b) = f x ||| (filter f xs)
                    in if a then x:b else b
 
@@ -41,29 +41,30 @@ reduceL :: (a -> a -> a) -> a -> [a] -> a
 reduceL f n xs = f n (reduceL' f n xs)
 
 reduceL' :: (a -> a -> a) -> a -> [a] -> a
-reduceL' f n []       = n
-reduceL' f n [x]      = x 
-reduceL' f n (x:y:xs) = let (a,b) = (f x y) ||| (reduceL' f n xs)
+reduceL' _ n []         = n
+reduceL' _ _ [x]        = x
+reduceL' f _ [x,y]      = f x y
+reduceL' f _ (x:y:z:xs) = let (a,b) = (f x y) ||| (reduceL' f n (z:xs))
                         in (f a b)
 
 --SCAN
-contraer :: (a -> a -> a) -> a -> [a] -> [a]
-contraer f n []       = []
-contraer f n [x]      = [x]
-contraer f n (x:y:xs) = let (a,b) = (f x y) ||| (contraer f n xs)
+contraer :: (a -> a -> a) -> [a] -> [a]
+contraer _ []       = []
+contraer _ [x]      = [x]
+contraer f (x:y:xs) = let (a,b) = (f x y) ||| (contraer f xs)
                         in a:b
 
 expandir :: (a -> a -> a) -> [a] -> ([a], a) -> ([a], a)
 expandir f xs (ys,z) = (expandir' f xs ys, z)
 
 expandir' :: (a -> a -> a) -> [a] -> [a] -> [a]
-expandir' f [] []           = []
-expandir' f [x] zs          = zs
+expandir' _ [] []           = []
+expandir' _ [x] zs          = zs
 expandir' f (x:y:xs) (z:zs) = let (a,b) = (f z x) ||| (expandir' f xs zs)
                               in z:a:b
 
 scanL :: (a -> a -> a) -> a -> [a] -> ([a], a)
-scanL f n []  = ([n],n)
+scanL _ n []  = ([n],n)
 scanL f n [x] = ([n], f n x)
 scanL f n xs  = (tabulateS (\i -> reduceS f n (takeS xs i)) ((lengthS xs) - 1)) ||| (reduceS f n xs)
 
@@ -87,5 +88,5 @@ instance Seq [] where
     showlS       = showlL
     joinS        = concatL
     reduceS      = reduceL
-    scanS f n xs = expandir f xs (scanL f n (contraer f n xs))
+    scanS f n xs = expandir f xs (scanL f n (contraer f xs))
     fromList     = id
