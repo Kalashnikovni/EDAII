@@ -135,33 +135,39 @@ un elemento y una lista del mismo tipo y aplica el algoritmo de reduce
 de forma que opera con la función dada $\oplus$ los elementos de la lista
 en forma de árbol logarítmico (gracias al algoritmo contraer).
 
-    Su \texttt{trabajo} se puede calcular teniendo en cuenta que la implementación
-del algoritmo emplea una reducción del tamaño del arreglo en las llamadas a
-la función $contraer$, que cumple:
+    Su \texttt{trabajo} y profundidad se pueden calcular teniendo en cuenta 
+que la implementación del algoritmo emplea una reducción del tamaño del 
+arreglo en las llamadas a la función $contraer$, que cumple:
 
 \begin{equation*}
     W \left( contraer\; \oplus \;xs \right) \in
-    O \left( \sum_{i=0}^{(\vert xs \vert /2 )-1} xs_{2*i} \oplus xs_{(2*i) +1} \right)
+    O \left( \sum_{i=0}^{(\vert xs \vert /2 )-1} W \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
 \end{equation*}
 
 \begin{equation*}
     S \left( contraer\; \oplus \;xs \right) \in
-    O \left( \right)
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert /2 )-1} S \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
 \end{equation*}
 
+\bigskip
 
+    Ahora, a la hora de calcularlos para $reduceS$, nosotros debemos forzar
+el orden de reducción, ya que la implementación de $contract$ utiliza un orden
+que no cumple la especificación necesaria. Luego, al realizar esto queda el costo
+de la suma de los costos de las aplicaciones y el tamaño de nuestra lista.
 
 \begin{equation*}
-    W \left( reduceS\; \oplus \;b \;xs \right) \in
-    O \left( \right)
+    W \left( reduceS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
 
 \begin{equation*}
-    S \left( reduceS\; \oplus \;b \;xs \right) \in
-    O \left( \right)
+    S \left( reduceS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
 
 
+\bigskip
 
 %SCANS
 \section*{\texttt{scanS}}
