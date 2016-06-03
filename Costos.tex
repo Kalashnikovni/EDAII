@@ -12,7 +12,7 @@
 \author{
     Marzorati Denise \\
     \texttt{marzorati.denise@gmail.com}
-    \and Nicolás Soncini \\
+    \and Soncini Nicolás \\
     \texttt{soncininicolas@gmail.com}
 }
 
@@ -55,75 +55,117 @@ Martin Ceresa
 %FILTERS
 \section*{\texttt{filterS}}
 
-    La implementación de \texttt{filterS} con listas hace uso del paralelismo para
+%TODO: Poner sangría acá%
+    La implementación de $filterS$ con listas hace uso del paralelismo para
 reducir su profundidad lo mas posible en base a las aplicaciones de la función 
 que se le pasa.
 
     El \texttt{trabajo} de la función se puede tomar de la siguiente forma:
 
 \begin{equation*}
-    W \left( filterS\; f \; \left( x_1:xs\right) \right) = W \left( f \; x_1 \right) + W \left(filterS\; f \; xs \right)
+    W \left(filterS\; f \;xs\right) \in
+    O \left( \sum_{i=0}^{\vert xs \vert -1} W \left( f\; xs_i \right) \right)
 \end{equation*}
 
 De esta forma, se calcula la aplicacion de la función argumento en cada
-llamada recursiva de \texttt{filterS} hasta que la lista termine vacía. Con lo
-cual se obtiene:
-    
-\begin{equation*}
-    W \left( filterS\; f \; s \right) \in
-    O \left( \sum_{i=0}^{\vert s \vert -1} W \left( f \; s_i \right) \right)
-\end{equation*}
+llamada recursiva de $filterS$ hasta que la lista termine vacía.
+En el mejor de los casos, si $W \left( f\; xs_i \right) \in O \left( 1 \right)$ queda
+su sumatoria como $\vert xs \vert$, por lo tanto se puede omitir sumar este valor
+en la cota superior del trabajo.
+%TODO: Cambiar esto para que deje espacio y ponga sangría
+\bigskip
+\\
 
-
-    La \texttt{profundidad} de la función se puede reducir gracias a la aplicación
+La \texttt{profundidad} de la función se puede reducir gracias a la aplicación
 en paralelo de la función argumento, por lo tanto se puede deducir que:
 
 \begin{equation*}
-    S \left( filterS\; f \; s \right) \in
-    O \left( \vert s \vert + \max_{i=0}^{\vert s \vert -1} S \left( f \; s_i \right) \right)
+    S \left(filterS\; f \; xs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{\vert xs \vert -1} S \left( f\; xs_i \right) \right)
 \end{equation*}
 
+En este caso, como el máximo de todos los trabajos puede quedar constante, debemos
+sumar el trabajo de obtener cada elemento, lo cual suma $\vert xs \vert$.
 
 
+\bigskip
+
+ 
 %SHOWT
 \section*{\texttt{showtS}}
 
-    La implementación de \texttt{showtS} con listas divide la lista en dos mitades
-y con las funciones \texttt{takeS} y \texttt{dropS}.
+    La implementación de $showtS$ con listas divide la lista en dos mitades
+y con las funciones $takeS$ y $dropS$
 
-    Asumiendo los siguientes puntos:
-
-\begin{equation*}
-    takeS xs n \in O \left( 1 \right)
-\end{equation*}
-\begin{equation*}
-    dropS xs n \in O \left( 1 \right)
-\end{equation*}
-    
-    Podemos concluir fácilmente que:
+    Sabemos que las funciones utilizadas son lineales:
 
 \begin{equation*}
-    W \left( showtS\; xs \right) \in O \left( 1 \right)
+    W/S \left( takeS\; xs\; n \right) \in 
+    O \left( \vert xs \vert \right)
+\end{equation*}
+\begin{equation*}
+    W/S \left( dropS\; xs\; n \right) \in 
+    O \left( \vert xs \vert \right)
+\end{equation*}
+tanto en su trabajo como en su profundidad. 
+
+\bigskip
+\\   
+    Luego, podemos concluir fácilmente que valen los siguientes costos ya
+que se aplica una vez cada función sobre la mitad de la lista.
+
+\begin{equation*}
+    W \left( showtS\; xs \right) \in O \left( \vert xs \vert \right)
 \end{equation*}
 
 \begin{equation*}
-    S \left( showtS\; xs \right) \in O \left( 1 \right)
+    S \left( showtS\; xs \right) \in O \left( \vert xs \vert \right)
 \end{equation*}
 
+
+\bigskip
     
 
 %REDUCES
 \section*{\texttt{reduceS}}
 
-    La implementación de \texttt{reduceS} 
+%TODO: En forma de arbol logaritmico?!?!?!
+    La implementación de $reduceS$ toma una función de costo desconocido,
+un elemento y una lista del mismo tipo y aplica el algoritmo de reduce
+de forma que opera con la función dada (\oplus) los elementos de la lista
+en forma de árbol logarítmico (gracias al algoritmo contraer)
+
+    Su \texttt{trabajo} se puede calcular teniendo en cuenta la fórmula del
+mismo que plantea (Suponiendo complejidad sobre el tamaño de la lista):
 
 \begin{equation*}
-    W \left( \right) \in
+    W_{reduceS} \left(\vert xs \vert \right) = 2 * W_f + W_{reduceS} \left( \vert xs \vert -2 \right)
+\end{equation*}
+
+\begin{equation*}
+    W \left( reduceS\; \oplus \;b \;xs \right) \in
     O \left( \right)
 \end{equation*}
 
 \begin{equation*}
-    W \left( \right) \in
+    S \left( reduceS\; \oplus \;b \;xs \right) \in
+    O \left( \right)
+\end{equation*}
+
+
+
+%SCANS
+\section*{\texttt{scanS}}
+
+    La implementación de \texttt{scanS}
+
+\begin{equation*}
+    W \left( scanS\; \oplus \;b \;s \right) \in
+    O \left( \right) 
+\end{equation*}
+
+\begin{equation*}
+    S \left( scanS\; \oplus \:b \:s \right) \in
     O \left( \right)
 \end{equation*}
 % \; is a thick space
