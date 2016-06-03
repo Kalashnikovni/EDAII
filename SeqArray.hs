@@ -1,6 +1,3 @@
--- Scan esta mal implementado, probar +3
--- Usando tabulateS?
-
 import Par
 import Seq
 import qualified Arr as A
@@ -8,23 +5,27 @@ import Arr ((!))
 
 --SHOWT
 showtA :: A.Arr a -> TreeView a (A.Arr a)
-showtA xs | lengthS xs == 0 = EMPTY
-	  | lengthS xs == 1 = ELT (nthS xs 0)
-	  | otherwise       = NODE (takeS xs (quot (lengthS xs) 2)) (dropS xs (quot (lengthS xs) 2))
+showtA xs 
+    | lengthS xs == 0 = EMPTY
+	| lengthS xs == 1 = ELT (nthS xs 0)
+	| otherwise       = NODE (takeS xs len) (dropS xs len)
+      where len = quot (lengthS xs) 2
 
 --SHOWL
 showlA :: A.Arr a -> ListView a (A.Arr a)
-showlA xs | lengthS xs == 0 = NIL
-	  | otherwise       = CONS (nthS xs 0) (dropS xs 1)
+showlA xs 
+    | lengthS xs == 0 = NIL
+	| otherwise       = CONS (nthS xs 0) (dropS xs 1)
 
 --TO_TREE
 toTree :: A.Arr a -> Tree a
-toTree xs | len == 0 = Empty
-          | len == 1 = Leaf (nthS xs 0)
-          | otherwise       = let (a,b) = (toTree (takeS xs (part len))) ||| (toTree (dropS xs (part len)))
-                              in Node a b
-	  where len = lengthS xs
-                part x = floor (2 ^ ((floor . logBase 2.0 . fromIntegral) (x - 1)))
+toTree xs 
+    | len == 0        = Empty
+    | len == 1        = Leaf (nthS xs 0)
+    | otherwise       = let (a,b) = (toTree (takeS xs (part len))) ||| (toTree (dropS xs (part len)))
+                        in Node a b
+                          where part x = floor (2 ^ ((floor . logBase 2.0 . fromIntegral) (x - 1)))
+                                len = lengthS xs
 
 --FILTER
 filterA :: (a -> Bool) -> A.Arr a -> A.Arr a
@@ -32,41 +33,42 @@ filterA f xs = joinS (tabulateS (\i -> if f (nthS xs i) then singletonS (nthS xs
 
 --REDUCE
 reduceA :: (a -> a -> a) -> a -> A.Arr a -> a
-reduceA f n xs = f n (reduceA' f n (toTree xs))
+reduceA f n xs 
+    | lengthS xs == 0 = n
+    | otherwise       = f n (reduceA' f (toTree xs))
 
-reduceA' :: (a -> a -> a) -> a -> Tree a -> a
-reduceA' f n Empty        = n
-reduceA' f n (Leaf x)     = x
-reduceA' f n (Node lt rt) = let (a,b) = (reduceA' f n lt) ||| (reduceA' f n rt) 
-                            in f a b
+reduceA' :: (a -> a -> a) -> Tree a -> a
+reduceA' _ (Leaf x)                 = x
+reduceA' f (Node (Leaf x) (Leaf y)) = f x y
+reduceA' f (Node lt rt)             = let (a,b) = (reduceA' f lt) ||| (reduceA' f rt) 
+                                      in f a b
 
 --SCAN
-contraer :: (a -> a -> a) -> a -> A.Arr a -> A.Arr a
-contraer f n xs
+contraer :: (a -> a -> a) -> A.Arr a -> A.Arr a
+contraer f xs
     | len == 0  = emptyS
     | len == 1  = xs
     | len == 2  = singletonS (f (nthS xs 0) (nthS xs 1))
-    | otherwise = let (a,b) = (contraer f n (takeS xs hm)) ||| (contraer f n (dropS xs hm))
+    | otherwise = let (a,b) = (contraer f (takeS xs hm)) ||| (contraer f (dropS xs hm))
                   in appendS a b
-      where hm = floor (2 ^ ((floor . logBase 2.0 . fromIntegral) (len - 1)))
-            len = lengthS xs
+                    where hm = floor (2 ^ ((floor . logBase 2.0 . fromIntegral) (len - 1)))
+                          len = lengthS xs
 
 scanA :: (a -> a -> a) -> a -> A.Arr a -> (A.Arr a, a)
-scanA f n xs = (tabulateS (\i -> reduceS f n (takeS xs i)) ((lengthS xs))) ||| (reduceS f n xs)
+scanA f n xs  = (tabulateS (\i -> reduceS f n (takeS xs i)) (lengthS xs)) ||| (reduceS f n xs)
 
-expandir' :: (a -> a -> a) -> a -> A.Arr a -> (A.Arr a, a) -> (A.Arr a, a)
-expandir' f n xs (ys, z) = (expandir f n xs ys, z)
+expandir :: (a -> a -> a) -> A.Arr a -> (A.Arr a, a) -> (A.Arr a, a)
+expandir f xs (ys, z) = (expandir' f xs ys, z)
 
-expandir :: (a -> a -> a) -> a -> A.Arr a -> A.Arr a -> A.Arr a
-expandir f n xs zs 
-        | lengthS xs == 0 && ((lengthS zs) == 0)    = emptyS
---        | lengthS zs == 0                           = singletonS (reduceS f n (takeS xs ((lengthS xs) - 1)))
---        | lengthS xs == 0                           = xs
+expandir' :: (a -> a -> a) -> A.Arr a -> A.Arr a -> A.Arr a
+expandir' f xs zs 
+    | lengthS xs == 0 && ((lengthS zs) == 0)    = emptyS
+    | lengthS zs == 0                           = xs
 	| lengthS xs == 1                           = takeS zs 1 
 	| otherwise                                 = 
-                              let c = takeS zs 1
-                                  (a,b) = (f (nthS zs 0) (nthS xs 0)) ||| (expandir f n (dropS xs 2) (dropS zs 1))
-			      in appendS (appendS c (singletonS a)) b
+            let c = takeS zs 1
+                (a,b) = (f (nthS zs 0) (nthS xs 0)) ||| (expandir' f (dropS xs 2) (dropS zs 1))
+		    in appendS (appendS c (singletonS a)) b
 
 instance Seq A.Arr where
     emptyS = A.empty
@@ -83,5 +85,5 @@ instance Seq A.Arr where
     showlS = showlA
     joinS = A.flatten
     reduceS = reduceA
-    scanS f n xs =  expandir' f n xs arg where arg = scanA f n (contraer f n xs)
+    scanS f n xs = expandir f xs (scanA f n (contraer f xs))
     fromList = A.fromList
