@@ -39,13 +39,13 @@ concatL (xs:ys:zss) = let (a,b) = (appendS xs ys) ||| (concatL zss)
 --REDUCE
 reduceL :: (a -> a -> a) -> a -> [a] -> a
 reduceL _ n [] = n
-reduceL f n xs = f n (reduceL' f n xs)
+reduceL f n xs = f n (reduceL' f xs)
 
-reduceL' :: (a -> a -> a) -> a -> [a] -> a
-reduceL' f n [x]      = x 
-reduceL' f n [x,y]    = f x y
-reduceL' f n (x:y:xs) = let (a,b) = (f x y) ||| (reduceL' f n xs)
-                        in (f a b)
+reduceL' :: (a -> a -> a) -> [a] -> a
+reduceL' f [x]      = x 
+reduceL' f [x,y]    = f x y
+reduceL' f (x:y:xs) = let (a,b) = (f x y) ||| (reduceL' f xs)
+                      in (f a b)
 
 --SCAN
 contraer :: (a -> a -> a) -> [a] -> [a]
