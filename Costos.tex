@@ -132,15 +132,24 @@ que se aplica una vez cada función sobre la mitad de la lista.
 %TODO: En forma de arbol logaritmico?!?!?!
     La implementación de $reduceS$ toma una función de costo desconocido,
 un elemento y una lista del mismo tipo y aplica el algoritmo de reduce
-de forma que opera con la función dada (\oplus) los elementos de la lista
-en forma de árbol logarítmico (gracias al algoritmo contraer)
+de forma que opera con la función dada $\oplus$ los elementos de la lista
+en forma de árbol logarítmico (gracias al algoritmo contraer).
 
-    Su \texttt{trabajo} se puede calcular teniendo en cuenta la fórmula del
-mismo que plantea (Suponiendo complejidad sobre el tamaño de la lista):
+    Su \texttt{trabajo} se puede calcular teniendo en cuenta que la implementación
+del algoritmo emplea una reducción del tamaño del arreglo en las llamadas a
+la función $contraer$, que cumple:
 
 \begin{equation*}
-    W_{reduceS} \left(\vert xs \vert \right) = 2 * W_f + W_{reduceS} \left( \vert xs \vert -2 \right)
+    W \left( contraer\; \oplus \;xs \right) \in
+    O \left( \sum_{i=0}^{(\vert xs \vert /2 )-1} xs_{2*i} \oplus xs_{(2*i) +1} \right)
 \end{equation*}
+
+\begin{equation*}
+    S \left( contraer\; \oplus \;xs \right) \in
+    O \left( \right)
+\end{equation*}
+
+
 
 \begin{equation*}
     W \left( reduceS\; \oplus \;b \;xs \right) \in
