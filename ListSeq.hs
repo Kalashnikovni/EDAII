@@ -41,19 +41,18 @@ reduceL :: (a -> a -> a) -> a -> [a] -> a
 reduceL _ n [] = n
 reduceL f n xs = f n (reduceL' f xs)
 
-reduceL' :: (a -> a -> a) -> [a] -> a
-reduceL' f [x]      = x 
-reduceL' f [x,y]    = f x y
-reduceL' f (x:y:xs) = let (a,b) = (f x y) ||| (reduceL' f xs)
-                      in (f a b)
-
---SCAN
 contraer :: (a -> a -> a) -> [a] -> [a]
 contraer f []       = []
 contraer f [x]      = [x]
 contraer f (x:y:xs) = let (a,b) = (f x y) ||| (contraer f xs)
-                        in a:b
+                      in a:b
 
+reduceL' :: (a -> a -> a) -> [a] -> a
+reduceL' f [x]      = x 
+reduceL' f [x,y]    = f x y
+reduceL' f xs       = reduceL' f (contraer f xs)
+
+--SCAN
 expandir :: (a -> a -> a) -> [a] -> ([a], a) -> ([a], a)
 expandir f xs (ys,z) = (expandir' f xs ys, z)
 
