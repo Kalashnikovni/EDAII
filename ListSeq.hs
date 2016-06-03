@@ -53,19 +53,19 @@ reduceL' f [x,y]    = f x y
 reduceL' f xs       = reduceL' f (contraer f xs)
 
 --SCAN
-expandir :: (a -> a -> a) -> [a] -> ([a], a) -> ([a], a)
-expandir f xs (ys,z) = (expandir' f xs ys, z)
-
-expandir' :: (a -> a -> a) -> [a] -> [a] -> [a]
-expandir' f [] []           = []
-expandir' f [x] zs          = zs
-expandir' f (x:y:xs) (z:zs) = let (a,b) = (f z x) ||| (expandir' f xs zs)
-                              in z:a:b
+expandir :: (a -> a -> a) -> [a] -> [a] -> [a]
+expandir f [] []           = []
+expandir f [x] zs          = zs
+expandir f (x:y:xs) (z:zs) = let (a,b) = (f z x) ||| (expandir' f xs zs)
+                             in z:a:b
 
 scanL :: (a -> a -> a) -> a -> [a] -> ([a], a)
-scanL f n []  = ([n],n)
-scanL f n [x] = ([n], f n x)
-scanL f n xs  = (tabulateS (\i -> reduceS f n (takeS xs i)) ((lengthS xs) - 1)) ||| (reduceS f n xs)
+scanL f n xs = (scanL' f n xs) ||| (reduceS f n xs)
+
+scanL' :: (a -> a -> a) -> a -> [a] -> [a]
+scanL' f n []  = n
+--scanL' f n [x] = 
+scanL' f n xs  = expandir (scanL' f n (contraer f xs))
 
 --SHOWL
 showlL :: [a] -> ListView a [a]
@@ -87,5 +87,5 @@ instance Seq [] where
     showlS       = showlL
     joinS        = concatL
     reduceS      = reduceL
-    scanS f n xs = expandir f xs (scanL f n (contraer f xs))
+--    scanS f n xs = expandir f xs (scanL f n (contraer f xs))
     fromList     = id
