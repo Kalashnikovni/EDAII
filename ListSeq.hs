@@ -56,16 +56,15 @@ reduceL' f xs       = reduceL' f (contraer f xs)
 expandir :: (a -> a -> a) -> [a] -> [a] -> [a]
 expandir f [] []           = []
 expandir f [x] zs          = zs
-expandir f (x:y:xs) (z:zs) = let (a,b) = (f z x) ||| (expandir' f xs zs)
+expandir f (x:y:xs) (z:zs) = let (a,b) = (f z x) ||| (expandir f xs zs)
                              in z:a:b
 
 scanL :: (a -> a -> a) -> a -> [a] -> ([a], a)
 scanL f n xs = (scanL' f n xs) ||| (reduceS f n xs)
 
 scanL' :: (a -> a -> a) -> a -> [a] -> [a]
-scanL' f n []  = n
---scanL' f n [x] = 
-scanL' f n xs  = expandir (scanL' f n (contraer f xs))
+scanL' f n [x] = [n]
+scanL' f n xs  = expandir f xs (scanL' f n (contraer f xs))
 
 --SHOWL
 showlL :: [a] -> ListView a [a]
