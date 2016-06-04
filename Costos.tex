@@ -1,13 +1,12 @@
 \nonstopmode
 
-\usepackage{fullpage}
-
 \documentclass[a4paper,10pt]{article}
-
+%\usepackage{fullpage}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{amsmath}
 \usepackage[margin=1in]{geometry}
+\usepackage{indentfirst}
 
 \author{
     Marzorati Denise \\
@@ -94,8 +93,9 @@ sumar el trabajo de obtener cada elemento, lo cual suma $\vert xs \vert$.
 %SHOWT
 \section*{\texttt{showtS}}
 
+
     La implementación de $showtS$ con listas divide la lista en dos mitades
-y con las funciones $takeS$ y $dropS$
+y con las funciones $takeS$ y $dropS$.
 
     Sabemos que las funciones utilizadas son lineales:
 
@@ -110,7 +110,7 @@ y con las funciones $takeS$ y $dropS$
 tanto en su trabajo como en su profundidad. 
 
 \bigskip
-\\   
+   
     Luego, podemos concluir fácilmente que valen los siguientes costos ya
 que se aplica una vez cada función sobre la mitad de la lista.
 
@@ -133,7 +133,8 @@ que se aplica una vez cada función sobre la mitad de la lista.
     La implementación de $reduceS$ toma una función de costo desconocido,
 un elemento y una lista del mismo tipo y aplica el algoritmo de reduce
 de forma que opera con la función dada $\oplus$ los elementos de la lista
-en forma de árbol logarítmico (gracias al algoritmo contraer).
+de a pares sobre el resultado de cada llamada recursiva. Este orden de 
+reducción (u operación) es el dado por el TAD.
 
     Su \texttt{trabajo} y profundidad se pueden calcular teniendo en cuenta 
 que la implementación del algoritmo emplea una reducción del tamaño del 
@@ -152,7 +153,7 @@ arreglo en las llamadas a la función $contraer$, que cumple:
 \bigskip
 
     Ahora, a la hora de calcularlos para $reduceS$, nosotros debemos forzar
-el orden de reducción, ya que la implementación de $contract$ utiliza un orden
+el orden de reducción, ya que la implementación de $contraer$ utiliza un orden
 que no cumple la especificación necesaria. Luego, al realizar esto queda el costo
 de la suma de los costos de las aplicaciones y el tamaño de nuestra lista.
 
@@ -160,6 +161,12 @@ de la suma de los costos de las aplicaciones y el tamaño de nuestra lista.
     W \left( reduceS \oplus \; b \; xs \right) \in
     O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
+
+\bigskip
+
+    Tanto su \texttt{trabajo} como su \texttt{profundidad} se ven afectadas por
+el reordenamiento de reducción sobre el resultado de $contraer$, por lo cual éste
+último queda como:
 
 \begin{equation*}
     S \left( reduceS \oplus \; b \; xs \right) \in
@@ -172,7 +179,43 @@ de la suma de los costos de las aplicaciones y el tamaño de nuestra lista.
 %SCANS
 \section*{\texttt{scanS}}
 
-    La implementación de \texttt{scanS}
+    La implementación de \texttt{scanS} hace uso de varias funciones auxiliares
+para su correcto funcionamiento y su fácil comprensión. Para obtener el costo del
+mismo debemos primero describir y especificar los costos de las funciones que lo 
+auxilian.
+
+    Como primera función auxiliar se encuentra $contraer$, que dada una función y
+una lista, opera de a pares sus elementos, tomando las llamadas recursivas y las 
+aplicaciones de la función en forma paralela. Con lo cual sus costos quedan de la 
+forma:
+
+\begin{equation*}
+    W \left( contraer \;\oplus \;xs \right) \in
+    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( contraer \;\oplus \;xs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\smallskip
+
+    Luego hacemos uso de la función $expandir$, que dada una función y dos listas,
+devuelve una lista con las operaciones de TODOTODOTODOTODOTODOTODOTODOTODOTODOTODO
+
+\begin{equation*}
+    W \left( expandir \;\oplus \;xs \;zs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( expandir \;\oplus \;xs \;zs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+
+
 
 \begin{equation*}
     W \left( scanS\; \oplus \;b \;s \right) \in
