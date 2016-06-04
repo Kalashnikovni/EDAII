@@ -54,7 +54,6 @@ Martin Ceresa
 %FILTERS
 \section*{\texttt{filterS}}
 
-%TODO: Poner sangría acá%
     La implementación de $filterS$ con listas hace uso del paralelismo para
 reducir su profundidad lo mas posible en base a las aplicaciones de la función 
 que se le pasa.
@@ -71,9 +70,8 @@ llamada recursiva de $filterS$ hasta que la lista termine vacía.
 En el mejor de los casos, si $W \left( f\; xs_i \right) \in O \left( 1 \right)$ queda
 su sumatoria como $\vert xs \vert$, por lo tanto se puede omitir sumar este valor
 en la cota superior del trabajo.
-%TODO: Cambiar esto para que deje espacio y ponga sangría
+
 \bigskip
-\\
 
 La \texttt{profundidad} de la función se puede reducir gracias a la aplicación
 en paralelo de la función argumento, por lo tanto se puede deducir que:
@@ -109,7 +107,7 @@ y con las funciones $takeS$ y $dropS$.
 \end{equation*}
 tanto en su trabajo como en su profundidad. 
 
-\bigskip
+\smallskip
    
     Luego, podemos concluir fácilmente que valen los siguientes costos ya
 que se aplica una vez cada función sobre la mitad de la lista.
@@ -129,7 +127,6 @@ que se aplica una vez cada función sobre la mitad de la lista.
 %REDUCES
 \section*{\texttt{reduceS}}
 
-%TODO: En forma de arbol logaritmico?!?!?!
     La implementación de $reduceS$ toma una función de costo desconocido,
 un elemento y una lista del mismo tipo y aplica el algoritmo de reduce
 de forma que opera con la función dada $\oplus$ los elementos de la lista
@@ -150,12 +147,34 @@ arreglo en las llamadas a la función $contraer$, que cumple:
     O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert /2 )-1} S \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
 \end{equation*}
 
-\bigskip
+\smallskip
 
     Ahora, a la hora de calcularlos para $reduceS$, nosotros debemos forzar
 el orden de reducción, ya que la implementación de $contraer$ utiliza un orden
-que no cumple la especificación necesaria. Luego, al realizar esto queda el costo
-de la suma de los costos de las aplicaciones y el tamaño de nuestra lista.
+que no cumple la especificación necesaria, pero es fácil identificar el rol que
+cumple al ser bien integrado a $reduceS$. 
+    Como primera función auxiliar se encuentra $contraer$, que dada una función y
+una lista, opera de a pares sus elementos, tomando las llamadas recursivas y las 
+aplicaciones de la función en forma paralela. Debemos entonces calcular los costos
+de $contraer$ para poder calcular los de la función pedida:
+
+\begin{equation*}
+    W \left( contraer \;\oplus \;xs \right) \in
+    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( contraer \;\oplus \;xs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\smallskip
+
+    Es claro entonces el costo que aporta adecuar esta función para que trabaje sobre
+cada resultado de un llamado recursivo de si mismo, cumpliendo así el orden de
+reducción pedido por el TAD de Secuencias para $reduceS$.
+Ahora si podemos calcular el trabajo de $reduceS$, el cual queda de la siguiente
+manera: 
 
 \begin{equation*}
     W \left( reduceS \oplus \; b \; xs \right) \in
@@ -165,8 +184,8 @@ de la suma de los costos de las aplicaciones y el tamaño de nuestra lista.
 \bigskip
 
     Tanto su \texttt{trabajo} como su \texttt{profundidad} se ven afectadas por
-el reordenamiento de reducción sobre el resultado de $contraer$, por lo cual éste
-último queda como:
+el reordenamiento de reducción sobre el resultado de $contraer$, por lo cual ésta
+última queda como:
 
 \begin{equation*}
     S \left( reduceS \oplus \; b \; xs \right) \in
@@ -175,6 +194,7 @@ el reordenamiento de reducción sobre el resultado de $contraer$, por lo cual é
 
 
 \bigskip
+
 
 %SCANS
 \section*{\texttt{scanS}}
@@ -186,18 +206,8 @@ auxilian.
 
     Como primera función auxiliar se encuentra $contraer$, que dada una función y
 una lista, opera de a pares sus elementos, tomando las llamadas recursivas y las 
-aplicaciones de la función en forma paralela. Con lo cual sus costos quedan de la 
-forma:
-
-\begin{equation*}
-    W \left( contraer \;\oplus \;xs \right) \in
-    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( contraer \;\oplus \;xs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
-\end{equation*}
+aplicaciones de la función en forma paralela. (Se detallan los costos en la
+especificación de costos de reduceS).
 
 \smallskip
 
@@ -214,18 +224,27 @@ devuelve una lista con las operaciones de TODOTODOTODOTODOTODOTODOTODOTODOTODOTO
     O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
 \end{equation*}
 
+\bigskip
 
-
+    Podemos concluír de esta forma, dado que la función $scanS$ para listas realiza
+llamados de expandir sobre su resultado recursivo al aplicar contraer a la lista
+dada, que su costo de \texttt{trabajo} se calcula como:
 
 \begin{equation*}
-    W \left( scanS\; \oplus \;b \;s \right) \in
+    W \left( scanS\; \oplus \;b \;xs \right) \in
     O \left( \right) 
 \end{equation*}
 
+    Y dado que TODOTODOTODOTODOTODOTODOTODOTODOTODOTODO:
+
 \begin{equation*}
-    S \left( scanS\; \oplus \:b \:s \right) \in
+    S \left( scanS\; \oplus \:b \:xs \right) \in
     O \left( \right)
 \end{equation*}
+
+
+\bigskip
+\newpage{}
 % \; is a thick space
 % \vert is |
 % \left( is big left parenthesis
@@ -234,301 +253,301 @@ devuelve una lista con las operaciones de TODOTODOTODOTODOTODOTODOTODOTODOTODOTO
 % \max is max (math mode)
 % \mathbf is bold formatting
 
-\begin{equation*}
-    W \left( filterS\; f \; s \right) \in
-    O \left( \sum_{i=0}^{\vert s \vert -1} W \left( f \; s_i \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( filterS\; f \; s \right) \in
-    O \left( \vert s \vert + \max_{i=0}^{\vert s \vert -1} S \left( f \; s_i \right) \right)
-\end{equation*}
-
-
-\section*{\texttt{showtS}}
-
-\texttt{showtS} precisa partir la secuencia dada en dos mitades, de modo que
-utiliza las funciones \texttt{takeS} y \texttt{dropS} (que en el caso de la
-implementación con listas son las mismas funciones que hay en \texttt{Prelude})
-que tienen orden lineal. Esto resulta en costo lineal para trabajo y profundidad:
-
-\begin{equation*}
-    W \left( showtS \; s \right) \in
-    O \left( \vert s \vert \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( showtS \; s \right) \in
-    O \left( \vert s \vert \right)
-\end{equation*}
-
-
-\section*{\texttt{reduceS}}
-
-Para la implementación de \texttt{reduceS} con listas se usa la función \texttt{contract}
-que toma una operación binaria $\oplus$ y una secuencia $s$ y la contrae aplicando
-la operación binaria a cada par de elementos contiguos. Para esto se calcula la
-operación entre dichos elementos en paralelo al cálculo del paso recursivo de
-\texttt{contract}, resultando en la suma de los trabajos de $\oplus$ aplicado a
-cada par de elementos contiguos de la secuencia para el trabajo y la longitud de
-la secuencia más la máxima de las profundidades de $\oplus$ aplicado a cada par de
-elementos contiguos de la secuencia para la profundidad:
-
-\begin{equation*}
-    W \left( contract \oplus s \right) \in
-    O \left( \vert s \vert + \sum_{i=0}^{\frac{\vert s \vert}{2} + 1} W \left( s_{2i} \oplus s_{2i+1} \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( contract \oplus s \right) \in
-    O \left( \vert s \vert + \max_{i=0}^{\frac{\vert s \vert}{2} + 1} S \left( s_{2i} \oplus s_{2i+1} \right) \right)
-\end{equation*}
-
-Luego, \texttt{reduceS} aplicado a una operación binaria $\oplus$, un elemento $b$,
-y una secuencia $s$, se calcula aplicando recursivamente \texttt{reduceS} a la
-misma operación $\oplus$, el mismo elemento $b$ y la secuencia obtenida de aplicar
-\texttt{contract} a $s$, generando el orden de reducción buscado. Esto es lo mismo
-para el trabajo y la profundidad, de modo que el costo de recorrer todo el árbol
-de reducción es proporcional al tamaño de la secuencia (lineal) pues estamos
-trabajando con listas. Luego, para el trabajo queda la suma de los trabajos de
-cada aplicación de $\oplus$ en el árbol de reducción más el tamaño de la secuencia y
-para la profundidad resulta la suma de las profundidades de cada aplicación de
-$\oplus$ en el árbol de reducción más el tamaño de la secuencia, ya que por cómo hay
-que forzar el orden de reducción no se puede aprovechar la profundidad de \texttt{contract}.
-
-\newpage
-
-\begin{equation*}
-    W \left( reduceS \oplus \; b \; s \right) \in
-    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} W \left( x \oplus y \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( reduceS \oplus \; b \; s \right) \in
-    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} S \left( x \oplus y \right) \right)
-\end{equation*}
-
-\section*{\texttt{scanS}}
-
-\texttt{scanS}, además de utilizar \texttt{contract}, emplea la función \texttt{combine},
-que toma una operación binaria $\oplus$, 2 secuencias, $s$ y $s'$, y una bandera
-que indica si el índice actual de la secuencia resultante es par (para construir
-el orden de reducción buscado). Cuando el índice es par (bandera en $True$),
-devuelve $s'_{\frac{i}{2}}$, mientras que cuando el índice es impar devuelve
-$s'_{\lfloor \frac{i}{2} \rfloor} \oplus s_{i-1}$ y en este caso ésta operación
-se efectúa en paralelo al paso recursivo, de modo que se mejora un poco la
-profundidad, quedando:
-
-\begin{equation*}
-    W \left( combine \oplus s \; s' \right) \in
-    O \left( \vert s \vert + \sum_{i=1}^{\frac{\vert s \vert}{2}} W \left( s'_{i} \oplus s_{2i - 1} \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( combine \oplus s \; s' \right) \in
-    O \left( \vert s \vert + \max_{i=1}^{\frac{\vert s \vert}{2}} S \left( s'_{i} \oplus s_{2i - 1} \right) \right)
-\end{equation*}
-
-Luego, \texttt{scanS} simplemente aplica \texttt{combine} con la operación binaria
-$\oplus$, la secuencia original, y la secuencia obtenida de aplicar \texttt{scanS}
-a la contracción de la secuencia original con la operación anterior. Dado que
-\texttt{contract} tiene trabajo por lo menos lineal y \texttt{combine} también,
-el trabajo de scan resulta lineal en la longitud de la secuencia más el trabajo
-de todas las aplicaciones de la operación binaria en el árbol de reducción. En
-cuanto a la profundidad, \texttt{contract} y \texttt{combine} también se comportan
-linealmente por lo menos, de modo que no se puede aprovechar lo poco que se ganó
-en profundidad, así que resulta la longitud de la secuencia más la suma de todas
-las profundidades de las aplicaciones de la operación binaria en el árbol de
-reducción de \texttt{scanS}:
-
-\begin{equation*}
-    W \left( scanS \oplus b \; s \right) \in
-    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} W \left( x \oplus y \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( scanS \oplus b \; s \right) \in
-    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} S \left( x \oplus y \right) \right)
-\end{equation*}
-
-\newpage{}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\part*{Implementación con arreglos persistentes}
-
-\section*{\texttt{filterS}}
-
-Para la implementación con arreglos persistentes de \texttt{filterS} primero se
-transforma la secuencia dada en una secuencia donde cada elemento es un singleton
-cuando el elemento cumple con el predicado, o una secuencia vacía cuando no cumple
-con el predicado. Esto se logra usando \texttt{tabulate} con una función que tiene
-costo igual al del predicado, para luego aplicar flatten a la lista resultante,
-de tamaño $\vert s \vert$, donde cada elemento es una secuencia de longitud 1 o 0.
-Luego, \texttt{filterS} resulta con trabajo igual a la suma de los trabajos de
-cada aplicación del predicado a los elementos de la secuencia, y profundidad igual
-al logaritmo de la longitud de la secuencia más el máximo costo de las profundidades
-de todas las aplicaciones del predicado a los elementos de la secuencia:
-
-\begin{equation*}
-    W \left( filterS \; f \; s \right) \in
-    O \left( \sum_{i=0}^{\vert s \vert -1} W(f \; s_i) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( filterS \; f \; s \right) \in
-    O \left( \text{lg} \; \vert s \vert + \max_{i=0}^{\vert s \vert -1} S(f \; s_i) \right)
-\end{equation*}
-
-
-\section*{\texttt{showtS}}
-
-La implementación de \texttt{showtS} con arreglos persistentes usa las funciones
-\texttt{takeS} y \texttt{dropS} (ambas con trabajo y profundidad $O \left( 1 \right)$,
-ya que usan \texttt{subArray}), de modo que el trabajo y la profundidad resulta
-constante:
-
-\begin{equation*}
-    W \left( showtS \; s \right) \in
-    O \left( 1 \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( showtS \; s \right) \in
-    O \left( 1 \right)
-\end{equation*}
-
-
-\section*{\texttt{reduceS}}
-
-Para la implementación de \texttt{reduceS} con arreglos persistentes definimos
-una función \texttt{contract} que contrae la secuencia dada con una operación
-binaria utilizando la función \texttt{tabulate} provista, que a su vez utiliza
-una función con el mismo costo que la operación binaria. En el caso del trabajo,
-\texttt{contract} tiene costo igual a la suma de los trabajos de las aplicaciones
-de la operación binaria a cada par de elementos consecutivos. Por otro lado,
-la profundidad simplemente tiene costo igual a la máxima profundidad de las
-aplicaciones de la operación binaria a cada par de elementos consecutivos:
-
-\begin{equation*}
-    W \left( contract \oplus s \right) \in
-    O \left( \sum_{i=0}^{\frac{\vert s \vert}{2} + 1} W \left( s_{2i} \oplus s_{2i+1} \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( contract \oplus s \right) \in
-    O \left( \max_{i=0}^{\frac{\vert s \vert}{2} + 1} S \left( s_{2i} \oplus s_{2i+1} \right) \right)
-\end{equation*}
-
-Luego, \texttt{reduceS} utiliza \texttt{contract} en cada llamado recursivo,
-transformando la secuencia dada en otra con la mitad de longitud original, hasta
-llegar a un singleton. En el caso del trabajo, esto resulta en recorrer la secuencia
-en cada paso recursivo (que esto resulta lineal, basta ver que es una recurrencia
-dada por $T \left( n \right) = T \left( \frac{n}{2} \right) + n$ donde $n$ es el
-tamaño de la secuencia) más la suma de todos los trabajos de la aplicación de la
-operación binaria en el árbol de reducción. Por otro lado, la profundidad resulta
-en lg $\vert s \vert$ (debido a que cada aplicación de \texttt{contract} resulta
-en una secuencia con tamaño igual a la mitad de la original) multiplicado por la
-máxima profundidad de todas las aplicaciones de la operación binaria en el árbol
-de reducción (que esto basta para especificar una cota superior, si quisiéramos
-acotarlo más obtendríamos la suma de las profundidades de todas las aplicaciones
-de la operación binaria en cada nivel del árbol de reducción, lo que resulta
-bastante engorroso de escribir, por eso se elije la profundidad dada que aún así
-es buena cota).
-
-\begin{equation*}
-    W \left( reduceS \oplus b \; s \right) \in
-    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} W \left( x \oplus y \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( reduceS \oplus b \; s \right) \in
-    O \left( \text{lg} \; \vert s \vert \; \max_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} S \left( x \oplus y \right) \right)
-\end{equation*}
-
-\section*{\texttt{scanS}}
-
-La implementación con arreglos persistentes de \texttt{scanS}, además de utilizar
-\texttt{reduceS}, emplea la función \texttt{combine} que es la que se encarga de
-construír el orden de reducción buscado.
-\texttt{combine} toma una operación binaria, $\oplus$ y 2 secuencias, $s$ y $s'$,
-donde $s'$ se espera que sea el resultado de aplicar \texttt{scanS} con $\oplus$,
-un elemento, y la contracción de $s$ con la operación binaria anterior. Ésta función
-utiliza \texttt{tabulate} con la operación $\oplus$ y una función auxiliar que
-para los índices pares devuelve $s'_{\frac{i}{2}}$ y para los índices impares
-devuelve $s'_{\lfloor \frac{i}{2} \rfloor} \oplus s_{i-1}$, que claramente
-aporta al trabajo y a la profundidad sólo en éste último caso, de modo la especificación
-de costo para \texttt{combine} queda así: 
-
-%La implementación con arreglos persistentes de \texttt{scanS} también utiliza
-%la función \texttt{contract} definida por nosotros (cuyo costo está especificado
-%en el análisis de \texttt{reduceS}) y una nueva función \texttt{combine} que lo
-%que hace es fusionar una secuencia $s$ y otra secuencia $s'$ mediante la operación
-%binaria provista, sabiendo que $s'$ es el resultado de \texttt{scanS} aplicado a
-%$contract s$
-%\texttt{combine} utiliza \texttt{tabulate} con una función que tiene costo $O \left( 1 \right)$
-%cuando el índice es par y $O \left( s'_{i} \oplus s_{2i-1} \right)$ cuando el índice 
-%es impar, de manera que el trabajo y profundidad dependen de éste último caso,
+%\begin{equation*}
+%    W \left( filterS\; f \; s \right) \in
+%    O \left( \sum_{i=0}^{\vert s \vert -1} W \left( f \; s_i \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( filterS\; f \; s \right) \in
+%    O \left( \vert s \vert + \max_{i=0}^{\vert s \vert -1} S \left( f \; s_i \right) \right)
+%\end{equation*}
+%
+%
+%\section*{\texttt{showtS}}
+%
+%\texttt{showtS} precisa partir la secuencia dada en dos mitades, de modo que
+%utiliza las funciones \texttt{takeS} y \texttt{dropS} (que en el caso de la
+%implementación con listas son las mismas funciones que hay en \texttt{Prelude})
+%que tienen orden lineal. Esto resulta en costo lineal para trabajo y profundidad:
+%
+%\begin{equation*}
+%    W \left( showtS \; s \right) \in
+%    O \left( \vert s \vert \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( showtS \; s \right) \in
+%    O \left( \vert s \vert \right)
+%\end{equation*}
+%
+%
+%\section*{\texttt{reduceS}}
+%
+%Para la implementación de \texttt{reduceS} con listas se usa la función \texttt{contract}
+%que toma una operación binaria $\oplus$ y una secuencia $s$ y la contrae aplicando
+%la operación binaria a cada par de elementos contiguos. Para esto se calcula la
+%operación entre dichos elementos en paralelo al cálculo del paso recursivo de
+%\texttt{contract}, resultando en la suma de los trabajos de $\oplus$ aplicado a
+%cada par de elementos contiguos de la secuencia para el trabajo y la longitud de
+%la secuencia más la máxima de las profundidades de $\oplus$ aplicado a cada par de
+%elementos contiguos de la secuencia para la profundidad:
+%
+%\begin{equation*}
+%    W \left( contract \oplus s \right) \in
+%    O \left( \vert s \vert + \sum_{i=0}^{\frac{\vert s \vert}{2} + 1} W \left( s_{2i} \oplus s_{2i+1} \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( contract \oplus s \right) \in
+%    O \left( \vert s \vert + \max_{i=0}^{\frac{\vert s \vert}{2} + 1} S \left( s_{2i} \oplus s_{2i+1} \right) \right)
+%\end{equation*}
+%
+%Luego, \texttt{reduceS} aplicado a una operación binaria $\oplus$, un elemento $b$,
+%y una secuencia $s$, se calcula aplicando recursivamente \texttt{reduceS} a la
+%misma operación $\oplus$, el mismo elemento $b$ y la secuencia obtenida de aplicar
+%\texttt{contract} a $s$, generando el orden de reducción buscado. Esto es lo mismo
+%para el trabajo y la profundidad, de modo que el costo de recorrer todo el árbol
+%de reducción es proporcional al tamaño de la secuencia (lineal) pues estamos
+%trabajando con listas. Luego, para el trabajo queda la suma de los trabajos de
+%cada aplicación de $\oplus$ en el árbol de reducción más el tamaño de la secuencia y
+%para la profundidad resulta la suma de las profundidades de cada aplicación de
+%$\oplus$ en el árbol de reducción más el tamaño de la secuencia, ya que por cómo hay
+%que forzar el orden de reducción no se puede aprovechar la profundidad de \texttt{contract}.
+%
+%\newpage
+%
+%\begin{equation*}
+%    W \left( reduceS \oplus \; b \; s \right) \in
+%    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} W \left( x \oplus y \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( reduceS \oplus \; b \; s \right) \in
+%    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} S \left( x \oplus y \right) \right)
+%\end{equation*}
+%
+%\section*{\texttt{scanS}}
+%
+%\texttt{scanS}, además de utilizar \texttt{contract}, emplea la función \texttt{combine},
+%que toma una operación binaria $\oplus$, 2 secuencias, $s$ y $s'$, y una bandera
+%que indica si el índice actual de la secuencia resultante es par (para construir
+%el orden de reducción buscado). Cuando el índice es par (bandera en $True$),
+%devuelve $s'_{\frac{i}{2}}$, mientras que cuando el índice es impar devuelve
+%$s'_{\lfloor \frac{i}{2} \rfloor} \oplus s_{i-1}$ y en este caso ésta operación
+%se efectúa en paralelo al paso recursivo, de modo que se mejora un poco la
+%profundidad, quedando:
+%
+%\begin{equation*}
+%    W \left( combine \oplus s \; s' \right) \in
+%    O \left( \vert s \vert + \sum_{i=1}^{\frac{\vert s \vert}{2}} W \left( s'_{i} \oplus s_{2i - 1} \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( combine \oplus s \; s' \right) \in
+%    O \left( \vert s \vert + \max_{i=1}^{\frac{\vert s \vert}{2}} S \left( s'_{i} \oplus s_{2i - 1} \right) \right)
+%\end{equation*}
+%
+%Luego, \texttt{scanS} simplemente aplica \texttt{combine} con la operación binaria
+%$\oplus$, la secuencia original, y la secuencia obtenida de aplicar \texttt{scanS}
+%a la contracción de la secuencia original con la operación anterior. Dado que
+%\texttt{contract} tiene trabajo por lo menos lineal y \texttt{combine} también,
+%el trabajo de scan resulta lineal en la longitud de la secuencia más el trabajo
+%de todas las aplicaciones de la operación binaria en el árbol de reducción. En
+%cuanto a la profundidad, \texttt{contract} y \texttt{combine} también se comportan
+%linealmente por lo menos, de modo que no se puede aprovechar lo poco que se ganó
+%en profundidad, así que resulta la longitud de la secuencia más la suma de todas
+%las profundidades de las aplicaciones de la operación binaria en el árbol de
+%reducción de \texttt{scanS}:
+%
+%\begin{equation*}
+%    W \left( scanS \oplus b \; s \right) \in
+%    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} W \left( x \oplus y \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( scanS \oplus b \; s \right) \in
+%    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} S \left( x \oplus y \right) \right)
+%\end{equation*}
+%
+%\newpage{}
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%\part*{Implementación con arreglos persistentes}
+%
+%\section*{\texttt{filterS}}
+%
+%Para la implementación con arreglos persistentes de \texttt{filterS} primero se
+%transforma la secuencia dada en una secuencia donde cada elemento es un singleton
+%cuando el elemento cumple con el predicado, o una secuencia vacía cuando no cumple
+%con el predicado. Esto se logra usando \texttt{tabulate} con una función que tiene
+%costo igual al del predicado, para luego aplicar flatten a la lista resultante,
+%de tamaño $\vert s \vert$, donde cada elemento es una secuencia de longitud 1 o 0.
+%Luego, \texttt{filterS} resulta con trabajo igual a la suma de los trabajos de
+%cada aplicación del predicado a los elementos de la secuencia, y profundidad igual
+%al logaritmo de la longitud de la secuencia más el máximo costo de las profundidades
+%de todas las aplicaciones del predicado a los elementos de la secuencia:
+%
+%\begin{equation*}
+%    W \left( filterS \; f \; s \right) \in
+%    O \left( \sum_{i=0}^{\vert s \vert -1} W(f \; s_i) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( filterS \; f \; s \right) \in
+%    O \left( \text{lg} \; \vert s \vert + \max_{i=0}^{\vert s \vert -1} S(f \; s_i) \right)
+%\end{equation*}
+%
+%
+%\section*{\texttt{showtS}}
+%
+%La implementación de \texttt{showtS} con arreglos persistentes usa las funciones
+%\texttt{takeS} y \texttt{dropS} (ambas con trabajo y profundidad $O \left( 1 \right)$,
+%ya que usan \texttt{subArray}), de modo que el trabajo y la profundidad resulta
+%constante:
+%
+%\begin{equation*}
+%    W \left( showtS \; s \right) \in
+%    O \left( 1 \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( showtS \; s \right) \in
+%    O \left( 1 \right)
+%\end{equation*}
+%
+%
+%\section*{\texttt{reduceS}}
+%
+%Para la implementación de \texttt{reduceS} con arreglos persistentes definimos
+%una función \texttt{contract} que contrae la secuencia dada con una operación
+%binaria utilizando la función \texttt{tabulate} provista, que a su vez utiliza
+%una función con el mismo costo que la operación binaria. En el caso del trabajo,
+%\texttt{contract} tiene costo igual a la suma de los trabajos de las aplicaciones
+%de la operación binaria a cada par de elementos consecutivos. Por otro lado,
+%la profundidad simplemente tiene costo igual a la máxima profundidad de las
+%aplicaciones de la operación binaria a cada par de elementos consecutivos:
+%
+%\begin{equation*}
+%    W \left( contract \oplus s \right) \in
+%    O \left( \sum_{i=0}^{\frac{\vert s \vert}{2} + 1} W \left( s_{2i} \oplus s_{2i+1} \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( contract \oplus s \right) \in
+%    O \left( \max_{i=0}^{\frac{\vert s \vert}{2} + 1} S \left( s_{2i} \oplus s_{2i+1} \right) \right)
+%\end{equation*}
+%
+%Luego, \texttt{reduceS} utiliza \texttt{contract} en cada llamado recursivo,
+%transformando la secuencia dada en otra con la mitad de longitud original, hasta
+%llegar a un singleton. En el caso del trabajo, esto resulta en recorrer la secuencia
+%en cada paso recursivo (que esto resulta lineal, basta ver que es una recurrencia
+%dada por $T \left( n \right) = T \left( \frac{n}{2} \right) + n$ donde $n$ es el
+%tamaño de la secuencia) más la suma de todos los trabajos de la aplicación de la
+%operación binaria en el árbol de reducción. Por otro lado, la profundidad resulta
+%en lg $\vert s \vert$ (debido a que cada aplicación de \texttt{contract} resulta
+%en una secuencia con tamaño igual a la mitad de la original) multiplicado por la
+%máxima profundidad de todas las aplicaciones de la operación binaria en el árbol
+%de reducción (que esto basta para especificar una cota superior, si quisiéramos
+%acotarlo más obtendríamos la suma de las profundidades de todas las aplicaciones
+%de la operación binaria en cada nivel del árbol de reducción, lo que resulta
+%bastante engorroso de escribir, por eso se elije la profundidad dada que aún así
+%es buena cota).
+%
+%\begin{equation*}
+%    W \left( reduceS \oplus b \; s \right) \in
+%    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} W \left( x \oplus y \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( reduceS \oplus b \; s \right) \in
+%    O \left( \text{lg} \; \vert s \vert \; \max_{(x \oplus y) \in \mathcal{O}_r(\oplus,b,s)} S \left( x \oplus y \right) \right)
+%\end{equation*}
+%
+%\section*{\texttt{scanS}}
+%
+%La implementación con arreglos persistentes de \texttt{scanS}, además de utilizar
+%\texttt{reduceS}, emplea la función \texttt{combine} que es la que se encarga de
+%construír el orden de reducción buscado.
+%\texttt{combine} toma una operación binaria, $\oplus$ y 2 secuencias, $s$ y $s'$,
+%donde $s'$ se espera que sea el resultado de aplicar \texttt{scanS} con $\oplus$,
+%un elemento, y la contracción de $s$ con la operación binaria anterior. Ésta función
+%utiliza \texttt{tabulate} con la operación $\oplus$ y una función auxiliar que
+%para los índices pares devuelve $s'_{\frac{i}{2}}$ y para los índices impares
+%devuelve $s'_{\lfloor \frac{i}{2} \rfloor} \oplus s_{i-1}$, que claramente
+%aporta al trabajo y a la profundidad sólo en éste último caso, de modo la especificación
+%de costo para \texttt{combine} queda así: 
+%
+%%La implementación con arreglos persistentes de \texttt{scanS} también utiliza
+%%la función \texttt{contract} definida por nosotros (cuyo costo está especificado
+%%en el análisis de \texttt{reduceS}) y una nueva función \texttt{combine} que lo
+%%que hace es fusionar una secuencia $s$ y otra secuencia $s'$ mediante la operación
+%%binaria provista, sabiendo que $s'$ es el resultado de \texttt{scanS} aplicado a
+%%$contract s$
+%%\texttt{combine} utiliza \texttt{tabulate} con una función que tiene costo $O \left( 1 \right)$
+%%cuando el índice es par y $O \left( s'_{i} \oplus s_{2i-1} \right)$ cuando el índice 
+%%es impar, de manera que el trabajo y profundidad dependen de éste último caso,
+%%quedando:
+%
+%\begin{equation*}
+%    W \left( combine \oplus s \; s' \right) \in
+%    O \left( \vert s \vert + \sum_{i=1}^{\frac{\vert s \vert}{2}} W \left( s'_{i} \oplus s_{2i-1} \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( combine \oplus s \; s' \right) \in
+%    O \left( \max_{i=1}^{\frac{\vert s \vert}{2}} S \left( s'_{i} \oplus s_{2i-1} \right) \right)
+%\end{equation*}
+%
+%Por último, \texttt{scanS} simplemente aplica \texttt{combine} a la secuencia original
+%y a la obtenida al aplicar \texttt{scanS} con la misma operación, el mismo elemento,
+%y la secuencia original contraída. De esta forma, en el caso del trabajo tiene
+%que recorrer toda la secuencia para poder calcular la contracción, además de la
+%suma de todos los trabajos aportados por las aplicaciones de la operación binaria
+%en la reducción de \texttt{scanS}. Por otro lado, en el caso de la profundidad
+%sucede algo similar a lo que pasó con \texttt{reduceS} (ver apartado anterior) de
+%modo que resulta lg $\vert s \vert$ multiplicado por la máxima profundidad de
+%todas las aplicaciones de la operación binaria en la reducción de \texttt{scanS},
 %quedando:
-
-\begin{equation*}
-    W \left( combine \oplus s \; s' \right) \in
-    O \left( \vert s \vert + \sum_{i=1}^{\frac{\vert s \vert}{2}} W \left( s'_{i} \oplus s_{2i-1} \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( combine \oplus s \; s' \right) \in
-    O \left( \max_{i=1}^{\frac{\vert s \vert}{2}} S \left( s'_{i} \oplus s_{2i-1} \right) \right)
-\end{equation*}
-
-Por último, \texttt{scanS} simplemente aplica \texttt{combine} a la secuencia original
-y a la obtenida al aplicar \texttt{scanS} con la misma operación, el mismo elemento,
-y la secuencia original contraída. De esta forma, en el caso del trabajo tiene
-que recorrer toda la secuencia para poder calcular la contracción, además de la
-suma de todos los trabajos aportados por las aplicaciones de la operación binaria
-en la reducción de \texttt{scanS}. Por otro lado, en el caso de la profundidad
-sucede algo similar a lo que pasó con \texttt{reduceS} (ver apartado anterior) de
-modo que resulta lg $\vert s \vert$ multiplicado por la máxima profundidad de
-todas las aplicaciones de la operación binaria en la reducción de \texttt{scanS},
-quedando:
-
-\begin{equation*}
-    W \left( scanS \oplus b \; s \right) \in
-    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} W \left( x \oplus y \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( scanS \oplus b \; s \right) \in
-    O \left( \text{lg} \; \vert s \vert \; \max_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} S \left( x \oplus y \right) \right)
-\end{equation*}
-
+%
+%\begin{equation*}
+%    W \left( scanS \oplus b \; s \right) \in
+%    O \left( \vert s \vert + \sum_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} W \left( x \oplus y \right) \right)
+%\end{equation*}
+%
+%\begin{equation*}
+%    S \left( scanS \oplus b \; s \right) \in
+%    O \left( \text{lg} \; \vert s \vert \; \max_{(x \oplus y) \in \mathcal{O}_s(\oplus,b,s)} S \left( x \oplus y \right) \right)
+%\end{equation*}
+%
 \end{document}
