@@ -10,13 +10,13 @@ tabulateL f n
 
 --MAP
 mapL :: (a -> b) -> [a] -> [b]
-mapL f []     = []
+mapL _ []     = []
 mapL f (x:xs) = let (a,b) = f x ||| (map f xs)
                 in a:b 
 
 --FILTER
 filterL :: (a -> Bool) -> [a] -> [a]
-filterL f [] = []
+filterL _ [] = []
 filterL f (x:xs) = let (a,b) = f x ||| (filter f xs)
                    in if a then x:b else b
 
@@ -42,28 +42,28 @@ reduceL _ n [] = n
 reduceL f n xs = f n (reduceL' f xs)
 
 contraer :: (a -> a -> a) -> [a] -> [a]
-contraer f []       = []
-contraer f [x]      = [x]
+contraer _ []       = []
+contraer _ [x]      = [x]
 contraer f (x:y:xs) = let (a,b) = (f x y) ||| (contraer f xs)
                       in a:b
 
 reduceL' :: (a -> a -> a) -> [a] -> a
-reduceL' f [x]      = x 
+reduceL' _ [x]      = x 
 reduceL' f [x,y]    = f x y
 reduceL' f xs       = reduceL' f (contraer f xs)
 
 --SCAN
 expandir :: (a -> a -> a) -> [a] -> [a] -> [a]
-expandir f [] []           = []
-expandir f [x] zs          = zs
-expandir f (x:y:xs) (z:zs) = let (a,b) = (f z x) ||| (expandir f xs zs)
+expandir _ [] []           = []
+expandir _ [_] zs          = zs
+expandir f (x:_:xs) (z:zs) = let (a,b) = (f z x) ||| (expandir f xs zs)
                              in z:a:b
 
 scanL :: (a -> a -> a) -> a -> [a] -> ([a], a)
 scanL f n xs = (scanL' f n xs) ||| (reduceS f n xs)
 
 scanL' :: (a -> a -> a) -> a -> [a] -> [a]
-scanL' f n [x] = [n]
+scanL' _ n [_] = [n]
 scanL' f n xs  = expandir f xs (scanL' f n (contraer f xs))
 
 --SHOWL
@@ -86,5 +86,5 @@ instance Seq [] where
     showlS       = showlL
     joinS        = concatL
     reduceS      = reduceL
---    scanS f n xs = expandir f xs (scanL f n (contraer f xs))
+    scanS        = scanL
     fromList     = id
