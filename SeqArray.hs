@@ -39,29 +39,25 @@ reduceA' f xs
 --SCAN
 contraer :: (a -> a -> a) -> A.Arr a -> A.Arr a
 contraer f xs
-    | even len  = joinS (tabulateS (\i -> singletonS (f (nthS xs (2*i)) (nthS xs (2*i + 1)))) (quot len 2)) 
-    | odd len   = appendS (joinS (tabulateS (\i -> singletonS (f (nthS xs (2*i)) (nthS xs (2*i + 1)))) (quot len 2))) (singletonS (nthS xs (len-1))) 
-      where len = lengthS xs
+    | even len  = tabi 
+    | odd len   = appendS tabi (singletonS (nthS xs (len-1))) 
+      where len  = lengthS xs
+            tabi = tabulateS (\i -> f (nthS xs (2*i)) (nthS xs (2*i + 1))) (quot len 2) 
 
 expandir :: (a -> a -> a) -> A.Arr a -> A.Arr a -> A.Arr a
 expandir f xs zs 
-    | lengthS xs == 0 && ((lengthS zs) == 0)    = emptyS
-    | lengthS zs == 0                           = xs
-	| lengthS xs == 1                           = takeS zs 1 
-	| otherwise                                 = 
-         let c     = takeS zs 1
-             (a,b) = (f (nthS zs 0) (nthS xs 0)) ||| (expandir f (dropS xs 2) (dropS zs 1))
-		 in appendS (appendS c (singletonS a)) b
+    | even len1                = tabi
+	| otherwise                = appendS tabi (singletonS (nthS xs (len1-1)))
+      where len1 = lengthS xs
+            tabi = tabulateS (\i -> if even i then (nthS zs (quot i 2)) else f (nthS zs (quot i 2)) (nthS xs (i-1))) len1
 
 scanA :: (a -> a -> a) -> a -> A.Arr a -> (A.Arr a, a)
 scanA f n xs = (scanA' f n xs) ||| (reduceS f n xs)
-    -- Codigo viejo: scanA f n xs  = (tabulateS (\i -> reduceS f n (takeS xs i)) engthS xs)) ||| (reduceS f n xs)
 
 scanA' :: (a -> a -> a) -> a -> A.Arr a -> A.Arr a
 scanA' f n xs 
     | lengthS xs == 1 = singletonS n
     | otherwise       = expandir f xs (scanA' f n (contraer f xs))
-    --Cambio al mismo algoritmo de la instancia en listas
 
 
 instance Seq A.Arr where
