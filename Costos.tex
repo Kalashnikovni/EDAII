@@ -300,8 +300,14 @@ y
 
 
 \bigskip
+\bigskip
 
-    De ambas se puede calcular, TODOTODOTODOTODOTODOTODO
+    De ambas se puede calcular que el \texttt{trabajo} de $filterS$ queda la
+suma de la longitud del arreglo y la sumatoria del costo de trabajo de las
+aplicaciones de la función a cada elemento. En el mejor de los casos, la función
+utilizada es de costo constante, con lo cual ya tendríamos el costo lineal sobre
+la longitud del arreglo en ese caso. De esto se puede omitir el tamaño del arreglo,
+con lo que nos quedaría:
  
 \begin{equation*}
     W \left(filterS \;f \;as \right) \in
@@ -309,6 +315,11 @@ y
 \end{equation*}
 
 \bigskip
+
+    Ahora, al momento de calcular su \texttt{profundidad} es una simple suma
+de las profundidades de $joinS$ y $tabulateS$, y no puede omitirse ninguna ya
+que cualquiera de ellas puede tomar un valor mayor a la otra, dependiendo del
+costo de las funciones que utiliza tabulate. Luego podemos observar que:
 
 \begin{equation*}
     S \left( filterS \;f \;as \right) \in
@@ -341,7 +352,7 @@ costos de las funciones auxiliares son constantes:
     O \left( \vert 1 \vert \right)
 \end{equation*}
 
-\smallskip
+\bigskip
    
     Y como tomar su longitud también lo es (útil para el cálculo de 
 $2^{ilog(\vert as \vert -1)}$), tenemos entonces que los costos para la función
