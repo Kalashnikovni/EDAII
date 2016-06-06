@@ -8,6 +8,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{indentfirst}
 
+
 \author{
     Marzorati Denise \\
     \texttt{marzorati.denise@gmail.com}
@@ -26,6 +27,10 @@
 }
 
 \begin{document}
+
+\bigskip
+\bigskip
+\bigskip
 
 \maketitle
 
@@ -248,15 +253,184 @@ en el orden de reducción dado. Con lo cual tenemos:
 
 
 
+
 \bigskip
 \newpage{}
 
 
 
 
+
 \part*{Implementación con Arreglos Persistentes}
 
+%FILTERS
 \section*{\texttt{filterS}}
+
+    La función $filterS$ toma una lista y una función sobre elementos de la misma
+y hace uso de $tabulateS$ para aplicar la función sobre cada elemento y $joinS$ para
+unir los resultados sueltos de la aplicación anterior.
+    Sabemos que los costos de $tabulateS$ y $joinS$ para arreglos persistentes son:
+
+\begin{equation*}
+    W \left(tabulateS \;f \;n \right) \in
+    O \left( \sum_{i=0}^{n-1} W \left( f\; i \right) \right)
+\end{equation*}
+
+\bigskip
+
+\begin{equation*}
+    S \left( tabulateS \;f \;n \right) \in
+    O \left( \max_{i=0}^{n-1} S \left( f\; i \right) \right)
+\end{equation*}
+
+\smallskip
+\begin{center}
+y
+\end{center}
+
+\begin{equation*}
+    W \left(joinS \;as\right) \in
+    O \left( \vert as \vert + \sum_{i=0}^{\vert as \vert -1} \left( \vert as_i \vert \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left(joinS\; \; as \right) \in
+    O \left( \;lg \; \vert as \vert \; \right)
+\end{equation*}
+
+
+\bigskip
+
+    De ambas se puede calcular, TODOTODOTODOTODOTODOTODO
+ 
+\begin{equation*}
+    W \left(filterS \;f \;as \right) \in
+    O \left( \sum_{i=0}^{\vert as \vert -1} W \left( f\; as_i \right) \right)
+\end{equation*}
+
+\bigskip
+
+\begin{equation*}
+    S \left( filterS \;f \;as \right) \in
+    O \left( \;lg \; \vert as \vert + \max_{i=0}^{\vert as \vert -1} S \left( f\; as_i \right) \right)
+\end{equation*}
+
+
+\bigskip
+
+
+%SHOWT
+\section*{\texttt{showtS}}
+
+%"PARA ESTE FORMATO"?!?!?! HABIENDO TANTAS PALABRAS NO SE ME OCURRE NADA MEJOR?!?!?!?
+    Para la implementación de $showtS$ para este formato debemos partir al arreglo
+en dos partes de forma que nos de una rapida idea de la forma en árbol del mismo.
+Para llevar a cabo esto hacemos uso de las funciones ya definidas para arreglos 
+persistentes $takeS$ y $dropS$, que devuelven un arreglo con los primeros o últimos
+elementos del arreglo según una cantidad arbitraria respectivamente.
+    Para considerar los costos de $showtS$ sabemos como primera instancia que los
+costos de las funciones auxiliares son constantes:
+
+\begin{equation*}
+    W/S \left( takeS\; as\; n \right) \in 
+    O \left( \vert 1 \vert \right)
+\end{equation*}
+
+\begin{equation*}
+    W/S \left( dropS\; as\; n \right) \in 
+    O \left( \vert 1 \vert \right)
+\end{equation*}
+
+\smallskip
+   
+    Y como tomar su longitud también lo es (útil para el cálculo de 
+$2^{ilog(\vert as \vert -1)}$), tenemos entonces que los costos para la función
+$showtS$ también quedan constantes:
+
+\begin{equation*}
+    W \left( showtS\; as \right) \in O \left( 1 \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( showtS\; as \right) \in O \left( 1 \right)
+\end{equation*}
+
+
+\bigskip
+    
+
+%REDUCES
+\section*{\texttt{reduceS}}
+
+\begin{equation*}
+    W \left( contraer\; \oplus \;xs \right) \in
+    O \left( \sum_{i=0}^{(\vert xs \vert /2 )-1} W \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( contraer\; \oplus \;xs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert /2 )-1} S \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
+\end{equation*}
+
+\smallskip
+
+\begin{equation*}
+    W \left( contraer \;\oplus \;xs \right) \in
+    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( contraer \;\oplus \;xs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\smallskip
+
+\begin{equation*}
+    W \left( reduceS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
+\end{equation*}
+
+\bigskip
+
+\begin{equation*}
+    S \left( reduceS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
+\end{equation*}
+
+
+\bigskip
+
+
+%SCANS
+\section*{\texttt{scanS}}
+
+
+\begin{equation*}
+    W \left( expandir \;\oplus \;xs \;zs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( expandir \;\oplus \;xs \;zs \right) \in
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+\end{equation*}
+
+\bigskip
+
+\begin{equation*}
+    W \left( scanS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
+\end{equation*}
+
+\begin{equation*}
+    S \left( scanS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
+\end{equation*}
+
+
+
+
 % \; is a thick space
 % \vert is |
 % \left( is big left parenthesis
