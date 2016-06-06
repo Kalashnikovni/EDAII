@@ -48,7 +48,7 @@ Martin Ceresa
 \newpage{}
 
 
-\part*{Implementación con listas}
+\part*{Implementación con Listas}
 
 
 %FILTERS
@@ -184,8 +184,8 @@ manera:
 \bigskip
 
     Tanto su \texttt{trabajo} como su \texttt{profundidad} se ven afectadas por
-el reordenamiento de reducción sobre el resultado de $contraer$, por lo cual ésta
-última queda como:
+el reordenamiento de reducción sobre el resultado de $contraer$, con lo cual la paralelización
+de ésta no puede ser aprovechada, y obtenemos:
 
 \begin{equation*}
     S \left( reduceS \oplus \; b \; xs \right) \in
@@ -212,7 +212,7 @@ especificación de costos de reduceS).
 \smallskip
 
     Luego hacemos uso de la función $expandir$, que dada una función y dos listas,
-devuelve una lista con las operaciones de TODOTODOTODOTODOTODOTODOTODOTODOTODOTODO
+devuelve una lista. 
 
 \begin{equation*}
     W \left( expandir \;\oplus \;xs \;zs \right) \in
@@ -228,23 +228,35 @@ devuelve una lista con las operaciones de TODOTODOTODOTODOTODOTODOTODOTODOTODOTO
 
     Podemos concluír de esta forma, dado que la función $scanS$ para listas realiza
 llamados de expandir sobre su resultado recursivo al aplicar contraer a la lista
-dada, que su costo de \texttt{trabajo} se calcula como:
+dada, que su \texttt{trabajo} es por lo menos lineal, el se calcula como:
 
 \begin{equation*}
-    W \left( scanS\; \oplus \;b \;xs \right) \in
-    O \left( \right) 
+    W \left( scanS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
 
-    Y dado que TODOTODOTODOTODOTODOTODOTODOTODOTODOTODO:
+    Y dado que las profundidades de $expandir$ y $contraer$ son como mínimo lineales,
+la \texttt{profundidad} de $scanS$ queda como la suma del tamaño de la lista y el
+máximo de las profundidades de la aplicación de la función sobre las sub-aplicaciones
+en el orden de reducción dado. Con lo cual tenemos:
 
 \begin{equation*}
-    S \left( scanS\; \oplus \:b \:xs \right) \in
-    O \left( \right)
+    S \left( scanS \oplus \; b \; xs \right) \in
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
+
+
 
 
 \bigskip
 \newpage{}
+
+
+
+
+\part*{Implementación con Arreglos Persistentes}
+
+\section*{\texttt{filterS}}
 % \; is a thick space
 % \vert is |
 % \left( is big left parenthesis
