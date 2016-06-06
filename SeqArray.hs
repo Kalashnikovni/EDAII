@@ -20,17 +20,6 @@ showlA xs
 	| otherwise       = CONS (nthS xs 0) (dropS xs 1)
 
 
---TO_TREE
-toTree :: A.Arr a -> Tree a
-toTree xs 
-    | len == 0        = Empty
-    | len == 1        = Leaf (nthS xs 0)
-    | otherwise       = let (a,b) = (toTree (takeS xs (part len))) ||| (toTree (dropS xs (part len)))
-                        in Node a b
-                          where part x = floor (2 ^ ((floor . logBase 2.0 . fromIntegral) (x - 1)))
-                                len = lengthS xs
-
-
 --FILTER
 filterA :: (a -> Bool) -> A.Arr a -> A.Arr a
 filterA f xs = joinS (tabulateS (\i -> if f (nthS xs i) then singletonS (nthS xs i) else emptyS) (lengthS xs)) 
@@ -40,37 +29,28 @@ filterA f xs = joinS (tabulateS (\i -> if f (nthS xs i) then singletonS (nthS xs
 reduceA :: (a -> a -> a) -> a -> A.Arr a -> a
 reduceA f n xs 
     | lengthS xs == 0 = n
-    | otherwise       = f n (reduceA' f (toTree xs))
+    | otherwise       = f n (reduceA' f xs)
 
-reduceA' :: (a -> a -> a) -> Tree a -> a
-reduceA' _ (Leaf x)                 = x
-reduceA' f (Node (Leaf x) (Leaf y)) = f x y
-reduceA' f (Node lt rt)             = let (a,b) = (reduceA' f lt) ||| (reduceA' f rt) 
-                                      in f a b
-
+reduceA' :: (a -> a -> a) -> A.Arr a -> a
+reduceA' f xs
+    | lengthS xs == 1  = nthS xs 0
+    | otherwise        = reduceA' f (contraer f xs)
 
 --SCAN
 contraer :: (a -> a -> a) -> A.Arr a -> A.Arr a
 contraer f xs
-    | len == 0  = emptyS
-    | len == 1  = xs
-    | len == 2  = singletonS (f (nthS xs 0) (nthS xs 1))
-    | otherwise = let (a,b) = (contraer f (takeS xs hm)) ||| (contraer f (dropS xs hm))
-                  in appendS a b
-                    where hm = floor (2 ^ ((floor . logBase 2.0 . fromIntegral) (len - 1)))
-                          len = lengthS xs
+    | even len  = joinS (tabulateS (\i -> singletonS (f (nthS xs (2*i)) (nthS xs (2*i + 1)))) (quot len 2)) 
+    | odd len   = appendS (joinS (tabulateS (\i -> singletonS (f (nthS xs (2*i)) (nthS xs (2*i + 1)))) (quot len 2))) (singletonS (nthS xs (len-1))) 
+      where len = lengthS xs
 
-expandir :: (a -> a -> a) -> A.Arr a -> (A.Arr a, a) -> (A.Arr a, a)
-expandir f xs (ys, z) = (expandir' f xs ys, z)
-
-expandir' :: (a -> a -> a) -> A.Arr a -> A.Arr a -> A.Arr a
-expandir' f xs zs 
+expandir :: (a -> a -> a) -> A.Arr a -> A.Arr a -> A.Arr a
+expandir f xs zs 
     | lengthS xs == 0 && ((lengthS zs) == 0)    = emptyS
     | lengthS zs == 0                           = xs
 	| lengthS xs == 1                           = takeS zs 1 
 	| otherwise                                 = 
          let c     = takeS zs 1
-             (a,b) = (f (nthS zs 0) (nthS xs 0)) ||| (expandir' f (dropS xs 2) (dropS zs 1))
+             (a,b) = (f (nthS zs 0) (nthS xs 0)) ||| (expandir f (dropS xs 2) (dropS zs 1))
 		 in appendS (appendS c (singletonS a)) b
 
 scanA :: (a -> a -> a) -> a -> A.Arr a -> (A.Arr a, a)
@@ -79,8 +59,8 @@ scanA f n xs = (scanA' f n xs) ||| (reduceS f n xs)
 
 scanA' :: (a -> a -> a) -> a -> A.Arr a -> A.Arr a
 scanA' f n xs 
-    | length xs == 0 = singletonS n
-    | otherwise      = expandir f xs (scanA' f n (contraer f xs))
+    | lengthS xs == 1 = singletonS n
+    | otherwise       = expandir f xs (scanA' f n (contraer f xs))
     --Cambio al mismo algoritmo de la instancia en listas
 
 
@@ -99,5 +79,5 @@ instance Seq A.Arr where
     showlS = showlA
     joinS = A.flatten
     reduceS = reduceA
-    scanS f n xs = expandir f xs (scanA f n (contraer f xs))
+    scanS = scanA
     fromList = A.fromList
