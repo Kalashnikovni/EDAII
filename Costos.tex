@@ -60,7 +60,7 @@ Martin Ceresa
 \section*{\texttt{filterS}}
 
     La implementación de $filterS$ con listas hace uso del paralelismo para
-reducir su profundidad lo mas posible en base a las aplicaciones de la función 
+reducir su profundidad lo más posible en base a las aplicaciones de la función 
 que se le pasa.
 
     El \texttt{trabajo} de la función se puede tomar de la siguiente forma:
@@ -70,7 +70,7 @@ que se le pasa.
     O \left( \sum_{i=0}^{\vert xs \vert -1} W \left( f\; xs_i \right) \right)
 \end{equation*}
 
-De esta forma, se calcula la aplicacion de la función argumento en cada
+De esta forma, se calcula la aplicación de la función argumento en cada
 llamada recursiva de $filterS$ hasta que la lista termine vacía.
 En el mejor de los casos, si $W \left( f\; xs_i \right) \in O \left( 1 \right)$ queda
 su sumatoria como $\vert xs \vert$, por lo tanto se puede omitir sumar este valor
@@ -141,7 +141,8 @@ reducción (u operación) es el dado por el TAD.
     Ahora, a la hora de calcularlos para $reduceS$, nosotros debemos forzar
 el orden de reducción, ya que la implementación de $contraer$ utiliza un orden
 que no cumple la especificación necesaria, pero es fácil identificar el rol que
-cumple al ser bien integrado a $reduceS$. 
+cumple al ser bien integrado a $reduceS$.
+
     Como primera función auxiliar se encuentra $contraer$, que dada una función y
 una lista, opera de a pares sus elementos, tomando las llamadas recursivas y las 
 aplicaciones de la función en forma paralela. Debemos entonces calcular los costos
@@ -162,7 +163,8 @@ de $contraer$ para poder calcular los de la función pedida:
     Es claro entonces el costo que aporta adecuar esta función para que trabaje sobre
 cada resultado de un llamado recursivo de si mismo, cumpliendo así el orden de
 reducción pedido por el TAD de Secuencias para $reduceS$.
-Ahora si podemos calcular el trabajo de $reduceS$, el cual queda de la siguiente
+
+    Ahora si podemos calcular el trabajo de $reduceS$, el cual queda de la siguiente
 manera: 
 
 \begin{equation*}
@@ -252,7 +254,7 @@ en el orden de reducción dado. Con lo cual tenemos:
 
     La función $filterS$ toma una lista y una función sobre elementos de la misma
 y hace uso de $tabulateS$ para aplicar la función sobre cada elemento y $joinS$ para
-unir los resultados sueltos de la aplicación anterior.
+unir los resultados sueltos de la aplicación anterior.\\
     Sabemos que los costos de $tabulateS$ y $joinS$ para arreglos persistentes son:
 
 \begin{equation*}
@@ -323,6 +325,7 @@ en dos partes de forma que nos de una rapida idea de la forma en árbol del mism
 Para llevar a cabo esto hacemos uso de las funciones ya definidas para arreglos 
 persistentes $takeS$ y $dropS$, que devuelven un arreglo con los primeros o últimos
 elementos del arreglo según una cantidad arbitraria respectivamente.
+
     Para considerar los costos de $showtS$ sabemos como primera instancia que los
 costos de las funciones auxiliares son constantes:
 
@@ -391,9 +394,9 @@ de trabajo de cada aplicación de la función binaria:
 
 \bigskip
     A la hora de calcular su \texttt{profundidad}, sabemos que llama a la función
-contraer $lg \;\vert as \vert$ veces, y la máxima profundidad de las aplicaciones
-del argumento primero sobre el orden de reducción dado por sus llamadas recursivas.
-Con lo cual nos queda:
+contraer $lg \;\vert as \vert$ veces, a esto sumamos la máxima profundidad de las 
+aplicaciones del argumento primero sobre el orden de reducción dado por sus 
+llamadas recursivas. Con lo cual nos queda:
 
 \begin{equation*}
     S \left( reduceS \oplus \; b \; as \right) \in
@@ -407,6 +410,27 @@ Con lo cual nos queda:
 %SCANS
 \section*{\texttt{scanS}}
 
+    Por último debemos calcular las cotas superiores de $scanS$, para
+esto tenemos que entender el procedimiento que realiza. La función $scanS$ en
+cada paso recursivo hace una expansión de llamarse a ella misma 
+sobre el resultado de realizar una contracción (esto nos asegura que se 
+realizarán igual cantida de expansiones y contracciones).
+
+\bigskip
+
+    Durante la contracción se toma al arreglo de valores y se lo opera
+dos a dos, dejando así un arreglo de la mitad de la longitud. El costo
+de esta función se expresa en un punto anterior.
+
+\bigskip
+
+    En la expansión se toma un arreglo y una tupla (que las llamadas recursivas 
+dentro de $scanS$ dejan llena con un arreglo en la primera posición y la 
+operación de todos los elementos en la segunda) y los opera y reordena según un
+algoritmo ya visto. De esta forma deja un resultado intermedio útil para otra
+llamada de expandir, o el resultado final de $scanS$ en la última llamada. Como
+$expandir$ utiliza un tabulate con funciones constantes en su argumento, podemos
+deifnir sus costos como:
 
 \begin{equation*}
     W \left( expandir \;\oplus \;xs \;zs \right) \in
@@ -420,6 +444,8 @@ Con lo cual nos queda:
 
 \bigskip
 
+    Luego, siendo que $scanS$ hace llamadas recursivas sobre un argumento de la
+mitad de tamaño, se calcula que hace $lg \;\vert as \vert$, TODOTODOTODOTODOTODO
 \begin{equation*}
     W \left( scanS \oplus \; b \; xs \right) \in
     O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
