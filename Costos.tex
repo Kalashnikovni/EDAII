@@ -398,12 +398,12 @@ su recursión y la única operación (de costo significante) que realiza:
 
 \begin{equation*}
     W \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs \vert)/2 - 1} W \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
 \end{equation*}
 
 \begin{equation*}
     S \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert)/2 - 1} S \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
 \end{equation*}
 
 \bigskip
