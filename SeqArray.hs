@@ -45,11 +45,7 @@ contraer f xs
             tabi = tabulateS (\i -> f (nthS xs (2*i)) (nthS xs (2*i + 1))) (quot len 2) 
 
 expandir :: (a -> a -> a) -> A.Arr a -> A.Arr a -> A.Arr a
-expandir f xs zs 
-    | even len1                = tabi
-	| otherwise                = appendS tabi (singletonS (nthS xs (len1-1)))
-      where len1 = lengthS xs
-            tabi = tabulateS (\i -> if even i then (nthS zs (quot i 2)) else f (nthS zs (quot i 2)) (nthS xs (i-1))) len1
+expandir f xs zs = tabulateS (\i -> if even i then (nthS zs (quot i 2)) else f (nthS zs (quot i 2)) (nthS xs (i-1))) (lengthS xs)
 
 scanA :: (a -> a -> a) -> a -> A.Arr a -> (A.Arr a, a)
 scanA f n xs = (scanA' f n xs) ||| (reduceS f n xs)
