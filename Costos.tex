@@ -205,12 +205,12 @@ devuelve una lista.
 
 \begin{equation*}
     W \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs \vert)/2 - 1} W \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
 \end{equation*}
 
 \begin{equation*}
     S \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert)/2 - 1} S \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
 \end{equation*}
 
 \bigskip
@@ -221,7 +221,7 @@ dada, que su \texttt{trabajo} es por lo menos lineal, el se calcula como:
 
 \begin{equation*}
     W \left( scanS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_s(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
 
     Y dado que las profundidades de $expandir$ y $contraer$ son como mínimo lineales,
@@ -231,7 +231,7 @@ en el orden de reducción dado. Con lo cual tenemos:
 
 \begin{equation*}
     S \left( scanS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
+    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_s(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
 
 
@@ -385,7 +385,7 @@ su recursión y la única operación (de costo significante) que realiza:
 
 \begin{equation*}
     S \left( reduceS \oplus \; b \; as \right) \in
-    O \left( \vert as \vert + \sum_{(as_i \oplus as_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( as_i \oplus as_j \right) \right)
+    O \left( lg \; \vert as \vert * \max_{(as_i \oplus as_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( as_i \oplus as_j \right) \right)
 \end{equation*}
 
 
