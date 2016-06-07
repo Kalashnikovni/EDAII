@@ -359,22 +359,30 @@ $showtS$ también quedan constantes:
 
     Para calcular los costos de la función $reduceS$ tenemos que hacerlo en función
 a los costos que posee $contraer$, ya que es la única función auxiliar que llama en
-su recursión y la única operación (de costo significante) que realiza:
+su recursión y la única operación (de costo significante) que realiza.
+
+    El costo de la función $contraer$ se calcula, para su \texttt{trabajo} como
+la suma de las aplicaciones de la función binaria, ya que viene dada por un $tabulateS$
+cuyo costo es éste mismo, y por la misma razon la \texttt{profundidad} es su
+máximo:
 
 \begin{equation*}
     W \left( contraer \;\oplus \;as \right) \in
-    O \left( \vert as \vert + \sum_{i=0}^{(\vert as / 2 \vert) - 1} W \left( as_{2i} \oplus as_{2i+1} \right) \right)
+    O \left( \sum_{i=0}^{(\vert as / 2 \vert) - 1} W \left( as_{2i} \oplus as_{2i+1} \right) \right)
 \end{equation*}
 
 \begin{equation*}
     S \left( contraer \;\oplus \;as \right) \in
-    O \left( lg \; \vert as \vert + \max_{i=0}^{(\vert as / 2 \vert) - 1} S \left( as_{2i} \oplus as_{2i+1} \right) \right)
+    O \left( \max_{i=0}^{(\vert as / 2 \vert) - 1} S \left( as_{2i} \oplus as_{2i+1} \right) \right)
 \end{equation*}
 
 \bigskip
 
-    A partir de esto podemos calcular el \texttt{trabajo} de $reduceS$ como la suma
-
+    Como la función $reduceS$ se llama recursivamente sobre el resultado de $contraer$,
+la cual devuelve un arreglo con la mitad de elementos, podemos ver que ésta debe
+entonces recorrer el arreglo en cada paso recursivo, dejándo asi un costo lineal sobre
+la longitud del mismo en su costo de \texttt{trabajo}, sumado obviamente a los costos
+de trabajo de cada aplicación de la función binaria:
 
 \begin{equation*}
     W \left( reduceS \oplus \; b \; as \right) \in
@@ -382,6 +390,10 @@ su recursión y la única operación (de costo significante) que realiza:
 \end{equation*}
 
 \bigskip
+    A la hora de calcular su \texttt{profundidad}, sabemos que llama a la función
+contraer $lg \;\vert as \vert$ veces, y la máxima profundidad de las aplicaciones
+del argumento primero sobre el orden de reducción dado por sus llamadas recursivas.
+Con lo cual nos queda:
 
 \begin{equation*}
     S \left( reduceS \oplus \; b \; as \right) \in
