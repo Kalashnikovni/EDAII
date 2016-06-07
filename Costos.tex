@@ -72,8 +72,8 @@ que se le pasa.
 
 De esta forma, se calcula la aplicación de la función argumento en cada
 llamada recursiva de $filterS$ hasta que la lista termine vacía.
-En el mejor de los casos, si $W \left( f\; xs_i \right) \in O \left( 1 \right)$ queda
-su sumatoria como $\vert xs \vert$, por lo tanto se puede omitir sumar este valor
+En el mejor de los casos, si $W \left( f\; xs_i \right) \in O \left( 1 \right)$,
+su sumatoria queda como $\vert xs \vert$, por lo tanto se puede omitir sumar este valor
 en la cota superior del trabajo.
 
 \bigskip
@@ -146,12 +146,19 @@ cumple al ser bien integrado a $reduceS$.
     Como primera función auxiliar se encuentra $contraer$, que dada una función y
 una lista, opera de a pares sus elementos, tomando las llamadas recursivas y las 
 aplicaciones de la función en forma paralela. Debemos entonces calcular los costos
-de $contraer$ para poder calcular los de la función pedida:
+de $contraer$ para poder calcular los de la función pedida, ésta queda como el costo
+de recorrer toda la lista sumado a los costos de las operaciones dos a dos. Pero ésta
+ultima, en el caso que todas las operaciones sean constantes, ya queda acotada por la
+longitud de la lista, luego podemos obviar éste parametro al calcular su trabajo:
 
 \begin{equation*}
     W \left( contraer \;\oplus \;xs \right) \in
-    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
+    O \left( \sum_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
 \end{equation*}
+
+    Lo mismo no sucede en su profundidad, ya que se suma el máximo de las profundidades
+de las operaciones, con lo cual éstas pueden quedar constantes, pero el trabajo está 
+acotado por el trabajo de recorrer la lista (que es lineal sobre su longitud):
 
 \begin{equation*}
     S \left( contraer \;\oplus \;xs \right) \in
@@ -164,7 +171,7 @@ de $contraer$ para poder calcular los de la función pedida:
 cada resultado de un llamado recursivo de si mismo, cumpliendo así el orden de
 reducción pedido por el TAD de Secuencias para $reduceS$.
 
-    Ahora si podemos calcular el trabajo de $reduceS$, el cual queda de la siguiente
+    Ahora sí podemos calcular el trabajo de $reduceS$, el cual queda de la siguiente
 manera: 
 
 \begin{equation*}
@@ -180,7 +187,7 @@ de ésta no puede ser aprovechada, y obtenemos:
 
 \begin{equation*}
     S \left( reduceS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
+    O \left( \vert xs \vert + lg \;\vert xs \vert \max_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
 
 
@@ -202,12 +209,13 @@ especificación de costos de reduceS).
 
 \smallskip
 
-    Luego hacemos uso de la función $expandir$, que dada una función y dos listas,
-devuelve una lista. 
+    Luego hacemos uso de la función $expandir$, que dada una función y dos listas
+(la primera siendo la lista argumento de $scanS$, y la segunda el resultado de aplicarle
+a la primera la función $contraer$) retorna una única lista que combina ambas:
 
 \begin{equation*}
     W \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs \vert)/2 - 1} W \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
+    O \left( \sum_{i=0}^{(\vert xs \vert)/2 - 1} W \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
 \end{equation*}
 
 \begin{equation*}
@@ -217,9 +225,9 @@ devuelve una lista.
 
 \bigskip
 
-    Podemos concluír de esta forma, dado que la función $scanS$ para listas realiza
-llamados de expandir sobre su resultado recursivo al aplicar contraer a la lista
-dada, que su \texttt{trabajo} es por lo menos lineal, el se calcula como:
+    Podemos concluir de esta forma, dado que la función $scanS$ para listas llama a 
+expandir sobre una recursión de aplicar contraer a la lista dada, que su \texttt{trabajo} 
+es por lo menos lineal, que se calcula como:
 
 \begin{equation*}
     W \left( scanS \oplus \; b \; xs \right) \in
@@ -331,12 +339,12 @@ costos de las funciones auxiliares son constantes:
 
 \begin{equation*}
     W/S \left( takeS\; as\; n \right) \in 
-    O \left( \vert 1 \vert \right)
+    O \left( 1 \right)
 \end{equation*}
 
 \begin{equation*}
     W/S \left( dropS\; as\; n \right) \in 
-    O \left( \vert 1 \vert \right)
+    O \left( 1 \right)
 \end{equation*}
 
 \bigskip
@@ -434,12 +442,12 @@ deifnir sus costos como:
 
 \begin{equation*}
     W \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs \vert)/2 - 1} W \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
+    O \left( \sum_{i=0}^{(\vert xs \vert)/2 - 1} W \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
 \end{equation*}
 
 \begin{equation*}
     S \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert)/2 - 1} S \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
+    O \left( \max_{i=0}^{(\vert xs \vert)/2 - 1} S \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
 \end{equation*}
 
 \bigskip
