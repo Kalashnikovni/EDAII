@@ -39,8 +39,8 @@ reduceA' f xs
 --SCAN
 contraer :: (a -> a -> a) -> A.Arr a -> A.Arr a
 contraer f xs
-    | even len  = tabi 
-    | odd len   = appendS tabi (singletonS (nthS xs (len-1))) 
+    | even len   = tabi 
+    | odd len    = appendS tabi (singletonS (nthS xs (len-1))) 
       where len  = lengthS xs
             tabi = tabulateS (\i -> f (nthS xs (2*i)) (nthS xs (2*i + 1))) (quot len 2) 
 
@@ -55,19 +55,19 @@ scanA f n xs
 
 
 instance Seq A.Arr where
-    emptyS = A.empty
+    emptyS     = A.empty
     singletonS = \x -> (A.fromList [x])
-    lengthS = A.length
-    nthS = (!)
-    tabulateS = A.tabulate
-    mapS = \f -> (\xs -> tabulateS (\i -> (f (nthS xs i))) (lengthS xs))
-    filterS = filterA 
-    appendS = \s -> (\t -> tabulateS (\i -> if i < (lengthS s) then nthS s i else nthS t (i - (lengthS s))) ((lengthS s) + (lengthS t)))
+    lengthS    = A.length
+    nthS       = (!)
+    tabulateS  = A.tabulate
+    mapS       = \f -> (\xs -> tabulateS (\i -> (f (nthS xs i))) (lengthS xs))
+    filterS    = filterA 
+    appendS    = \s -> (\t -> tabulateS (\i -> if i < (lengthS s) then nthS s i else nthS t (i - (lengthS s))) ((lengthS s) + (lengthS t)))
     takeS xs n = A.subArray 0 n xs
     dropS xs n = A.subArray n (lengthS xs - n) xs
-    showtS = showtA
-    showlS = showlA
-    joinS = A.flatten
-    reduceS = reduceA
-    scanS = scanA
-    fromList = A.fromList
+    showtS     = showtA
+    showlS     = showlA
+    joinS      = A.flatten
+    reduceS    = reduceA
+    scanS      = scanA
+    fromList   = A.fromList
