@@ -138,22 +138,6 @@ de forma que opera con la función dada $\oplus$ los elementos de la lista
 de a pares sobre el resultado de cada llamada recursiva. Este orden de 
 reducción (u operación) es el dado por el TAD.
 
-    Su \texttt{trabajo} y profundidad se pueden calcular teniendo en cuenta 
-que la implementación del algoritmo emplea una reducción del tamaño del 
-arreglo en las llamadas a la función $contraer$, que cumple:
-
-\begin{equation*}
-    W \left( contraer\; \oplus \;xs \right) \in
-    O \left( \sum_{i=0}^{(\vert xs \vert /2 )-1} W \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( contraer\; \oplus \;xs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert /2 )-1} S \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
-\end{equation*}
-
-\smallskip
-
     Ahora, a la hora de calcularlos para $reduceS$, nosotros debemos forzar
 el orden de reducción, ya que la implementación de $contraer$ utiliza un orden
 que no cumple la especificación necesaria, pero es fácil identificar el rol que
@@ -373,40 +357,35 @@ $showtS$ también quedan constantes:
 %REDUCES
 \section*{\texttt{reduceS}}
 
+    Para calcular los costos de la función $reduceS$ tenemos que hacerlo en función
+a los costos que posee $contraer$, ya que es la única función auxiliar que llama en
+su recursión y la única operación (de costo significante) que realiza:
+
 \begin{equation*}
-    W \left( contraer\; \oplus \;xs \right) \in
-    O \left( \sum_{i=0}^{(\vert xs \vert /2 )-1} W \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
+    W \left( contraer \;\oplus \;as \right) \in
+    O \left( \vert as \vert + \sum_{i=0}^{(\vert as / 2 \vert) - 1} W \left( as_{2i} \oplus as_{2i+1} \right) \right)
 \end{equation*}
 
 \begin{equation*}
-    S \left( contraer\; \oplus \;xs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs \vert /2 )-1} S \left( xs_{2*i} \oplus xs_{(2*i) +1} \right) \right)
+    S \left( contraer \;\oplus \;as \right) \in
+    O \left( lg \; \vert as \vert + \max_{i=0}^{(\vert as / 2 \vert) - 1} S \left( as_{2i} \oplus as_{2i+1} \right) \right)
 \end{equation*}
 
-\smallskip
+\bigskip
+
+    A partir de esto podemos calcular el \texttt{trabajo} de $reduceS$ como la suma
+
 
 \begin{equation*}
-    W \left( contraer \;\oplus \;xs \right) \in
-    O \left( \vert xs \vert + \sum_{i=0}^{(\vert xs / 2 \vert) - 1} W \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
-\end{equation*}
-
-\begin{equation*}
-    S \left( contraer \;\oplus \;xs \right) \in
-    O \left( \vert xs \vert + \max_{i=0}^{(\vert xs / 2 \vert) - 1} S \left( xs_{2i} \oplus xs_{2i+1} \right) \right)
-\end{equation*}
-
-\smallskip
-
-\begin{equation*}
-    W \left( reduceS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
+    W \left( reduceS \oplus \; b \; as \right) \in
+    O \left( \vert as \vert + \sum_{(as_i \oplus as_j) \in \mathcal{O}_r(\oplus,b,as)} W \left( as_i \oplus as_j \right) \right)
 \end{equation*}
 
 \bigskip
 
 \begin{equation*}
-    S \left( reduceS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
+    S \left( reduceS \oplus \; b \; as \right) \in
+    O \left( \vert as \vert + \sum_{(as_i \oplus as_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( as_i \oplus as_j \right) \right)
 \end{equation*}
 
 
