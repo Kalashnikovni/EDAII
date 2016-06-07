@@ -2,6 +2,8 @@
 
 \documentclass[a4paper,10pt]{article}
 %\usepackage{fullpage}
+\usepackage{listings}
+\lstset{language=Haskell}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{amsmath}
@@ -62,6 +64,8 @@ Martin Ceresa
     La implementación de $filterS$ con listas hace uso del paralelismo para
 reducir su profundidad lo más posible en base a las aplicaciones de la función 
 que se le pasa.
+\lstinputlisting[firstline=88, lastline=88]{SeqList.hs}
+\lstinputlisting[firstline=20, lastline=23]{SeqList.hs}
 
     El \texttt{trabajo} de la función se puede tomar de la siguiente forma:
 
@@ -99,7 +103,8 @@ sumar el trabajo de obtener cada elemento, lo cual suma $\vert xs \vert$.
 
     La implementación de $showtS$ con listas divide la lista en dos mitades
 y con las funciones $takeS$ y $dropS$.
-
+\lstinputlisting[firstline=92, lastline=92]{SeqList.hs}
+\lstinputlisting[firstline=27, lastline=33]{SeqList.hs}
     Sabemos que las funciones utilizadas son lineales:
 
 \begin{equation*}
@@ -138,6 +143,10 @@ de forma que opera con la función dada $\oplus$ los elementos de la lista
 de a pares sobre el resultado de cada llamada recursiva. Este orden de 
 reducción (u operación) es el dado por el TAD.
 
+\lstinputlisting[firstline=95, lastline=95]{SeqList.hs}
+\lstinputlisting[firstline=45, lastline=47]{SeqList.hs}
+\lstinputlisting[firstline=55, lastline=58]{SeqList.hs}
+
     Ahora, a la hora de calcularlos para $reduceS$, nosotros debemos forzar
 el orden de reducción, ya que la implementación de $contraer$ utiliza un orden
 que no cumple la especificación necesaria, pero es fácil identificar el rol que
@@ -145,11 +154,15 @@ cumple al ser bien integrado a $reduceS$.
 
     Como primera función auxiliar se encuentra $contraer$, que dada una función y
 una lista, opera de a pares sus elementos, tomando las llamadas recursivas y las 
-aplicaciones de la función en forma paralela. Debemos entonces calcular los costos
-de $contraer$ para poder calcular los de la función pedida, ésta queda como el costo
-de recorrer toda la lista sumado a los costos de las operaciones dos a dos. Pero ésta
-ultima, en el caso que todas las operaciones sean constantes, ya queda acotada por la
-longitud de la lista, luego podemos obviar éste parametro al calcular su trabajo:
+aplicaciones de la función en forma paralela. 
+
+\lstinputlisting[firstline=49, lastline=52]{SeqList.hs}
+
+    Debemos entonces calcular los costos de $contraer$ para poder calcular los de la 
+función pedida, ésta queda como el costo de recorrer toda la lista sumado a los costos 
+de las operaciones dos a dos. Pero ésta ultima, en el caso que todas las operaciones 
+sean constantes, ya queda acotada por la longitud de la lista, luego podemos obviar 
+éste parametro al calcular su trabajo:
 
 \begin{equation*}
     W \left( contraer \;\oplus \;xs \right) \in
@@ -198,9 +211,12 @@ de ésta no puede ser aprovechada, y obtenemos:
 \section*{\texttt{scanS}}
 
     La implementación de \texttt{scanS} hace uso de varias funciones auxiliares
-para su correcto funcionamiento y su fácil comprensión. Para obtener el costo del
-mismo debemos primero describir y especificar los costos de las funciones que lo 
-auxilian.
+para su correcto funcionamiento y su fácil comprensión.
+\lstinputlisting[firstline=96, lastline=96]{SeqList.hs}
+\lstinputlisting[firstline=68, lastline=73]{SeqList.hs}
+
+    Para obtener el costo del mismo debemos primero describir y especificar los 
+costos de las funciones que lo auxilian.
 
     Como primera función auxiliar se encuentra $contraer$, que dada una función y
 una lista, opera de a pares sus elementos, tomando las llamadas recursivas y las 
@@ -212,6 +228,7 @@ especificación de costos de reduceS).
     Luego hacemos uso de la función $expandir$, que dada una función y dos listas
 (la primera siendo la lista argumento de $scanS$, y la segunda el resultado de aplicarle
 a la primera la función $contraer$) retorna una única lista que combina ambas:
+\lstinputlisting[firstline=62, lastline=65]{SeqList.hs}
 
 \begin{equation*}
     W \left( expandir \;\oplus \;xs \;zs \right) \in
@@ -263,6 +280,9 @@ en el orden de reducción dado. Con lo cual tenemos:
     La función $filterS$ toma una lista y una función sobre elementos de la misma
 y hace uso de $tabulateS$ para aplicar la función sobre cada elemento y $joinS$ para
 unir los resultados sueltos de la aplicación anterior.\\
+\lstinputlisting[firstline=64, lastline=64]{SeqArray.hs}
+\begin{scriptsize}\lstinputlisting[firstline=24, lastline=25]{SeqArray.hs}\end{scriptsize}
+
     Sabemos que los costos de $tabulateS$ y $joinS$ para arreglos persistentes son:
 
 \begin{equation*}
@@ -333,6 +353,8 @@ en dos partes de forma que nos de una rapida idea de la forma en árbol del mism
 Para llevar a cabo esto hacemos uso de las funciones ya definidas para arreglos 
 persistentes $takeS$ y $dropS$, que devuelven un arreglo con los primeros o últimos
 elementos del arreglo según una cantidad arbitraria respectivamente.
+\lstinputlisting[firstline=68, lastline=68]{SeqArray.hs}
+\lstinputlisting[firstline=8, lastline=13]{SeqArray.hs}
 
     Para considerar los costos de $showtS$ sabemos como primera instancia que los
 costos de las funciones auxiliares son constantes:
@@ -371,6 +393,9 @@ $showtS$ también quedan constantes:
     Para calcular los costos de la función $reduceS$ tenemos que hacerlo en función
 a los costos que posee $contraer$, ya que es la única función auxiliar que llama en
 su recursión y la única operación (de costo significante) que realiza.
+\lstinputlisting[firstline=71, lastline=71]{SeqArray.hs}
+\lstinputlisting[firstline=29, lastline=37]{SeqArray.hs}
+\lstinputlisting[firstline=40, lastline=45]{SeqArray.hs}
 
     El costo de la función $contraer$ se calcula, para su \texttt{trabajo} como
 la suma de las aplicaciones de la función binaria, ya que viene dada por un $tabulateS$
@@ -423,7 +448,8 @@ esto tenemos que entender el procedimiento que realiza. La función $scanS$ en
 cada paso recursivo hace una expansión de llamarse a ella misma 
 sobre el resultado de realizar una contracción (esto nos asegura que se 
 realizarán igual cantidad de expansiones y contracciones).
-
+\lstinputlisting[firstline=72, lastline=72]{SeqArray.hs}
+\lstinputlisting[firstline=50, lastline=54]{SeqArray.hs}
 \bigskip
 
     Durante la contracción se toma al arreglo de valores y se lo opera
@@ -435,7 +461,7 @@ de esta función se expresa en un punto anterior.
     En la expansión se toma un arreglo y una tupla (que las llamadas recursivas 
 dentro de $scanS$ dejan llena con un arreglo en la primera posición y la 
 operación de todos los elementos en la segunda) y los opera y reordena según un
-algoritmo ya visto. De esta forma deja un resultado intermedio útil para otra
+algoritmo ya visto.  De esta forma deja un resultado intermedio útil para otra
 llamada de expandir, o el resultado final de $scanS$ en la última llamada. Como
 $expandir$ utiliza un tabulate con funciones constantes en su argumento, podemos
 deifnir sus costos como:
