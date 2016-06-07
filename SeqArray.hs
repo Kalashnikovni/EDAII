@@ -44,16 +44,14 @@ contraer f xs
       where len  = lengthS xs
             tabi = tabulateS (\i -> f (nthS xs (2*i)) (nthS xs (2*i + 1))) (quot len 2) 
 
-expandir :: (a -> a -> a) -> A.Arr a -> A.Arr a -> A.Arr a
-expandir f xs zs = tabulateS (\i -> if even i then (nthS zs (quot i 2)) else f (nthS zs (quot i 2)) (nthS xs (i-1))) (lengthS xs)
+expandir :: (a -> a -> a) -> A.Arr a -> (A.Arr a, a) -> (A.Arr a, a)
+expandir f xs (zs, z) = (tabulateS (\i -> if even i then (nthS zs (quot i 2)) else f (nthS zs (quot i 2)) (nthS xs (i-1))) (lengthS xs), z)
 
 scanA :: (a -> a -> a) -> a -> A.Arr a -> (A.Arr a, a)
-scanA f n xs = (scanA' f n xs) ||| (reduceS f n xs)
-
-scanA' :: (a -> a -> a) -> a -> A.Arr a -> A.Arr a
-scanA' f n xs 
-    | lengthS xs == 1 = singletonS n
-    | otherwise       = expandir f xs (scanA' f n (contraer f xs))
+scanA f n xs 
+    | lengthS xs == 0 = (singletonS n, n)
+    | lengthS xs == 1 = (singletonS n, f (nthS xs 0) n)
+    | otherwise       = expandir f xs (scanA f n (contraer f xs))
 
 
 instance Seq A.Arr where
