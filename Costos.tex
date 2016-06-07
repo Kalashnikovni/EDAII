@@ -241,7 +241,7 @@ en el orden de reducción dado. Con lo cual tenemos:
 
 \begin{equation*}
     S \left( scanS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_s(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
+    O \left( \vert xs \vert +  lg \;\vert xs \vert \max_{(xs_i \oplus xs_j) \in \mathcal{O}_s(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
 \end{equation*}
 
 
@@ -422,7 +422,7 @@ llamadas recursivas. Con lo cual nos queda:
 esto tenemos que entender el procedimiento que realiza. La función $scanS$ en
 cada paso recursivo hace una expansión de llamarse a ella misma 
 sobre el resultado de realizar una contracción (esto nos asegura que se 
-realizarán igual cantida de expansiones y contracciones).
+realizarán igual cantidad de expansiones y contracciones).
 
 \bigskip
 
@@ -441,27 +441,35 @@ $expandir$ utiliza un tabulate con funciones constantes en su argumento, podemos
 deifnir sus costos como:
 
 \begin{equation*}
-    W \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \sum_{i=0}^{(\vert xs \vert)/2 - 1} W \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
+    W \left( expandir \;\oplus \;as \;bs \right) \in
+    O \left( \sum_{i=0}^{(\vert as \vert)/2 - 1} W \left( as_{\lfloor (2i+1)/2 \rfloor} \oplus bs_{2i} \right) \right)
 \end{equation*}
 
 \begin{equation*}
-    S \left( expandir \;\oplus \;xs \;zs \right) \in
-    O \left( \max_{i=0}^{(\vert xs \vert)/2 - 1} S \left( xs_{\lfloor (2i+1)/2 \rfloor} \oplus zs_{2i} \right) \right)
+    S \left( expandir \;\oplus \;as \;bs \right) \in
+    O \left( \max_{i=0}^{(\vert bs \vert)/2 - 1} S \left( as_{\lfloor (2i+1)/2 \rfloor} \oplus bs_{2i} \right) \right)
 \end{equation*}
 
 \bigskip
 
-    Luego, siendo que $scanS$ hace llamadas recursivas sobre un argumento de la
-mitad de tamaño, se calcula que hace $lg \;\vert as \vert$, TODOTODOTODOTODOTODO
-\begin{equation*}
-    W \left( scanS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} W \left( xs_i \oplus xs_j \right) \right)
-\end{equation*}
+    Tenemos entonces, dado que cada llamada de $scanS$ sobre un arreglo de una
+longitud dada realiza dos llamadas de funciones (una de $contraer$ y otra de
+$expandir$) con costos idénticos, y una llamada recursiva sobre un arreglo de
+la mitad de la longitud, que su costo de \texttt{trabajo} es:
 
 \begin{equation*}
-    S \left( scanS \oplus \; b \; xs \right) \in
-    O \left( \vert xs \vert + \sum_{(xs_i \oplus xs_j) \in \mathcal{O}_r(\oplus,b,xs)} S \left( xs_i \oplus xs_j \right) \right)
+    W \left( scanS \oplus \; b \; as \right) \in
+    O \left( \vert as \vert + \sum_{(as_i \oplus as_j) \in \mathcal{O}_r(\oplus,b,as)} W \left( as_i \oplus as_j \right) \right)
+\end{equation*}
+
+    Con el mismo criterio, se llama a ambas funciones en forma del árbol de reduccion,
+con lo cual obtenemos una profundidad del máximo de todas las aplicaciones de éste árbol 
+(que realizan en conjunto $contraer$ y $expandir$) multiplicado por la profundidad del
+mismo (logarítmica): 
+
+\begin{equation*}
+    S \left( scanS \oplus \; b \; as \right) \in
+    O \left( lg \;\vert as \vert\; \max_{(as_i \oplus as_j) \in \mathcal{O}_r(\oplus,b,as)} S \left( as_i \oplus as_j \right) \right)
 \end{equation*}
 
 
